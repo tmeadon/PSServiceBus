@@ -13,7 +13,7 @@ namespace PSServiceBus
 {
     [Cmdlet(VerbsCommon.Get, "SbSubscription")]
     [OutputType(typeof(SbSubscription))]
-    public class GetSbSubscription : PSCmdlet
+    public class GetSbSubscription : Cmdlet
     {
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }

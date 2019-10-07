@@ -13,7 +13,7 @@ namespace PSServiceBus
 {
     [Cmdlet(VerbsCommon.Get, "SbTopic")]
     [OutputType(typeof(SbQueue))]
-    public class GetSbTopic : PSCmdlet
+    public class GetSbTopic : Cmdlet
     {
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }

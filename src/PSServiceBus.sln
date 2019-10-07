@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PSServiceBus", "PSServiceBus.csproj", "{89C3F522-E2D5-4022-9717-0A75555537B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PSServiceBus", "PSServiceBus\PSServiceBus.csproj", "{89C3F522-E2D5-4022-9717-0A75555537B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PSServiceBus.Tests", "PSServiceBus.Tests\PSServiceBus.Tests.csproj", "{266A7D88-C4BB-4A19-A863-21CB7D03628D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{89C3F522-E2D5-4022-9717-0A75555537B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89C3F522-E2D5-4022-9717-0A75555537B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89C3F522-E2D5-4022-9717-0A75555537B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{266A7D88-C4BB-4A19-A863-21CB7D03628D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{266A7D88-C4BB-4A19-A863-21CB7D03628D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{266A7D88-C4BB-4A19-A863-21CB7D03628D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{266A7D88-C4BB-4A19-A863-21CB7D03628D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
