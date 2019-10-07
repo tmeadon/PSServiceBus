@@ -3,48 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Management;
 using System.Management.Automation;
-using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
 
 namespace PSServiceBus
 {
     [Cmdlet(VerbsCommon.Get, "SbSubscription")]
     [OutputType(typeof(SbSubscription))]
-    public class GetSbSubscription: Cmdlet
+    public class GetSbSubscription : PSCmdlet
     {
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }
 
-        [Parameter(Mandatory = true, ValueFromPipelineByPropertyName = true)]
+        [Parameter(Mandatory = false)]
         public string TopicName { get; set; }
-
-        private NamespaceManager namespaceManager;
-
-        protected override void BeginProcessing()
-        {
-            this.namespaceManager = NamespaceManager.CreateFromConnectionString(NamespaceConnectionString);
-        }
 
         protected override void ProcessRecord()
         {
-            IEnumerable<SubscriptionDescription> subscriptions;
+            IList<SubscriptionDescription> subscriptions = new List<SubscriptionDescription>();
+            ManagementClient managementClient = new ManagementClient(NamespaceConnectionString);
 
-            subscriptions = namespaceManager.GetSubscriptions(TopicName);
+            subscriptions = managementClient.GetSubscriptionsAsync(TopicName).Result;
 
             foreach (var sub in subscriptions)
             {
-                MessageCountDetails messageCountDetails = sub.MessageCountDetails;
+                SubscriptionRuntimeInfo subscriptionRuntimeInfo = managementClient.GetSubscriptionRuntimeInfoAsync(TopicName, sub.SubscriptionName).Result;
 
                 WriteObject(new SbSubscription
                 {
-                    Name = sub.Name,
+                    Name = sub.SubscriptionName,
                     Topic = sub.TopicPath,
-                    ActiveMessages = messageCountDetails.ActiveMessageCount,
-                    DeadLetteredMessages = messageCountDetails.DeadLetterMessageCount
+                    ActiveMessages = subscriptionRuntimeInfo.MessageCountDetails.ActiveMessageCount,
+                    DeadLetteredMessages = subscriptionRuntimeInfo.MessageCountDetails.DeadLetterMessageCount
                 });
             }
         }
     }
 }
+
