@@ -8,44 +8,60 @@ using System.Management.Automation;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
+using PSServiceBus.Helpers;
 
 namespace PSServiceBus
 {
     [Cmdlet(VerbsCommon.Get, "SbQueue")]
     [OutputType(typeof(SbQueue))]
-    public class GetSbQueue: Cmdlet
+    public class GetSbQueue : Cmdlet
     {
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }
 
         [Parameter(Mandatory = false)]
-        public string QueueName { get; set; }
-        
+        public string QueueName { get; set; } = null;
+
+
         protected override void ProcessRecord()
         {
+            SbManager sbManager = new SbManager(NamespaceConnectionString);
+
+            var output = ProduceOutput(sbManager, QueueName);
+
+            foreach (var item in output)
+            {
+                WriteObject(item);
+            }
+        }
+
+        private IList<SbQueue> ProduceOutput(ISbManager SbManager, string QueueName)
+        {
+            IList<SbQueue> result = new List<SbQueue>();
             IList<QueueDescription> queues = new List<QueueDescription>();
-            ManagementClient managementClient = new ManagementClient(NamespaceConnectionString);
 
             if (QueueName != null)
             {
-                queues.Add(managementClient.GetQueueAsync(QueueName).Result);  //queues.Where(i => i.Path == QueueName).ToList<QueueDescription>();
+                queues.Add(SbManager.GetQueueByName(QueueName));
             }
             else
             {
-                queues = managementClient.GetQueuesAsync().Result;
+                queues = SbManager.GetAllQueues();
             }
-            
+
             foreach (var queue in queues)
             {
-                QueueRuntimeInfo queueRuntimeInfo = managementClient.GetQueueRuntimeInfoAsync(queue.Path).Result;
-        
-                WriteObject(new SbQueue
+                QueueRuntimeInfo queueRuntimeInfo = SbManager.GetQueueRuntimeInfo(queue.Path);
+
+                result.Add(new SbQueue
                 {
                     Name = queue.Path,
                     ActiveMessages = queueRuntimeInfo.MessageCountDetails.ActiveMessageCount,
                     DeadLetteredMessages = queueRuntimeInfo.MessageCountDetails.DeadLetterMessageCount
                 });
             }
+
+            return result;
         }
     }
 }
