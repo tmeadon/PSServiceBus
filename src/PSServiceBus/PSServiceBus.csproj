@@ -13,8 +13,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Outputs\" />
-  </ItemGroup>
-
 </Project>
