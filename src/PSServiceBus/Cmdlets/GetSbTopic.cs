@@ -5,7 +5,7 @@ using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
 using PSServiceBus.Helpers;
 
-namespace PSServiceBus
+namespace PSServiceBus.Cmdlets
 {
     [Cmdlet(VerbsCommon.Get, "SbTopic")]
     [OutputType(typeof(SbQueue))]

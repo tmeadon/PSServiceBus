@@ -2,7 +2,7 @@
 using PSServiceBus.Helpers;
 using PSServiceBus.Enums;
 
-namespace PSServiceBus
+namespace PSServiceBus.Cmdlets
 {
     [Cmdlet(VerbsCommunications.Send, "SbMessage")]
     public class SendSbMessage : Cmdlet
