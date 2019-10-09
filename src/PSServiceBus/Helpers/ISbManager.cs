@@ -22,6 +22,6 @@ namespace PSServiceBus.Helpers
 
         SubscriptionRuntimeInfo GetSubscriptionRuntimeInfo(string TopicName, string SubscriptionName);
 
-        bool QueueOrTopicExists(ISbManager sbManager, string entityPath, SbEntityTypes entityType);
+        bool QueueOrTopicExists(string entityPath, SbEntityTypes entityType);
     }
 }

@@ -85,7 +85,7 @@ namespace PSServiceBus.Helpers
             return managementClient.GetSubscriptionRuntimeInfoAsync(TopicName, SubscriptionName).Result;
         }
 
-        public bool QueueOrTopicExists(ISbManager sbManager, string entityPath, SbEntityTypes entityType)
+        public bool QueueOrTopicExists(string entityPath, SbEntityTypes entityType)
         {
             switch (entityType)
             {

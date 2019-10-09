@@ -14,7 +14,7 @@ namespace PSServiceBus.Helpers
 
         public SbSender(string NamespaceConnectionString, string EntityPath, SbEntityTypes EntityType, ISbManager sbManager)
         {
-            if (sbManager.QueueOrTopicExists(sbManager, EntityPath, EntityType))
+            if (sbManager.QueueOrTopicExists(EntityPath, EntityType))
             {
                 string webSocketsConnectionString = SetMessageTransportToWebSockets(NamespaceConnectionString);
                 this.messageSender = new MessageSender(webSocketsConnectionString, EntityPath, null);
