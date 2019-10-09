@@ -52,7 +52,7 @@ namespace PSServiceBus.Helpers
 
         public SubscriptionDescription GetSubscriptionByName(string TopicName, string SubscriptionName)
         {
-            var topic = this.GetTopicByName(TopicName);
+            this.GetTopicByName(TopicName);
 
             try
             {
@@ -66,19 +66,21 @@ namespace PSServiceBus.Helpers
 
         public IList<SubscriptionDescription> GetAllSubscriptions(string TopicName)
         {
+            this.GetTopicByName(TopicName);
+
             return managementClient.GetSubscriptionsAsync(TopicName).Result;
         }
 
         public QueueRuntimeInfo GetQueueRuntimeInfo(string QueueName)
         {
-            var queue = this.GetQueueByName(QueueName);
+            this.GetQueueByName(QueueName);
 
             return managementClient.GetQueueRuntimeInfoAsync(QueueName).Result; 
         }
 
         public SubscriptionRuntimeInfo GetSubscriptionRuntimeInfo(string TopicName, string SubscriptionName)
         {
-            var sub = this.GetSubscriptionByName(TopicName, SubscriptionName);
+            this.GetSubscriptionByName(TopicName, SubscriptionName);
 
             return managementClient.GetSubscriptionRuntimeInfoAsync(TopicName, SubscriptionName).Result;
         }
