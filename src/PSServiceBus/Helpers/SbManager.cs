@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Exceptions;
+using PSServiceBus.Enums;
 
 namespace PSServiceBus.Helpers
 {
@@ -80,6 +81,35 @@ namespace PSServiceBus.Helpers
             var sub = this.GetSubscriptionByName(TopicName, SubscriptionName);
 
             return managementClient.GetSubscriptionRuntimeInfoAsync(TopicName, SubscriptionName).Result;
+        }
+
+        public bool QueueOrTopicExists(ISbManager sbManager, string entityPath, SbEntityTypes entityType)
+        {
+            switch (entityType)
+            {
+                case SbEntityTypes.Queue:
+                    try
+                    {
+                        this.GetQueueByName(entityPath);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                case SbEntityTypes.Topic:
+                    try
+                    {
+                        this.GetTopicByName(entityPath);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                default:
+                    return false;
+            }
         }
     }
 }

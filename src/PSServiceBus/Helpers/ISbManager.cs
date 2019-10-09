@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Azure.ServiceBus.Management;
+using PSServiceBus.Enums;
 
 namespace PSServiceBus.Helpers
 {
@@ -22,5 +23,7 @@ namespace PSServiceBus.Helpers
         QueueRuntimeInfo GetQueueRuntimeInfo(string QueueName);
 
         SubscriptionRuntimeInfo GetSubscriptionRuntimeInfo(string TopicName, string SubscriptionName);
+
+        bool QueueOrTopicExists(ISbManager sbManager, string entityPath, SbEntityTypes entityType);
     }
 }
