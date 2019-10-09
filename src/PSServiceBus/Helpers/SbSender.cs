@@ -10,6 +10,7 @@ namespace PSServiceBus.Helpers
     public class SbSender
     {
         private readonly MessageSender messageSender;
+        public TransportType TransportType;
 
         public SbSender(string NamespaceConnectionString, string EntityPath, SbEntityTypes EntityType, ISbManager sbManager)
         {
@@ -17,6 +18,7 @@ namespace PSServiceBus.Helpers
             {
                 string webSocketsConnectionString = SetMessageTransportToWebSockets(NamespaceConnectionString);
                 this.messageSender = new MessageSender(webSocketsConnectionString, EntityPath, null);
+                this.TransportType = messageSender.ServiceBusConnection.TransportType;
             }
             else
             {
