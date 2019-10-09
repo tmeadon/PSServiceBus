@@ -4,7 +4,7 @@ namespace PSServiceBus.Helpers
 {
     public interface ISbSender
     {
-        MessageSender messageSender { get; set; }
+        MessageSender MessageSender { get; set; }
 
         void SendMessage(string MessageBody);
     }
