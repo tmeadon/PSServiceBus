@@ -5,7 +5,7 @@ using Microsoft.Azure.ServiceBus.Management;
 
 namespace PSServiceBus.Helpers
 {
-    interface ISbManager
+    public interface ISbManager
     {
         QueueDescription GetQueueByName(string QueueName);
 

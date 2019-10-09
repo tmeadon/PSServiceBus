@@ -7,7 +7,7 @@ namespace PSServiceBus.Helpers
 {
     public class SbManager: ISbManager
     {
-        private ManagementClient managementClient;
+        private readonly ManagementClient managementClient;
 
         public SbManager(string NamespaceConnectionString)
         {

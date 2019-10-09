@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Management;
 using System.Management.Automation;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
+using PSServiceBus.Helpers;
 
 namespace PSServiceBus
 {
@@ -23,28 +19,42 @@ namespace PSServiceBus
 
         protected override void ProcessRecord()
         {
+            SbManager sbManager = new SbManager(NamespaceConnectionString);
+
+            var output = BuildTopicList(sbManager, TopicName);
+
+            foreach (var item in output)
+            {
+                WriteObject(item);
+            }
+        }
+
+        private IList<SbTopic> BuildTopicList(ISbManager SbManager, string TopicName)
+        {
+            IList<SbTopic> result = new List<SbTopic>();
             IList<TopicDescription> topics = new List<TopicDescription>();
-            ManagementClient managementClient = new ManagementClient(NamespaceConnectionString);
 
             if (TopicName != null)
             {
-                topics.Add(managementClient.GetTopicAsync(TopicName).Result);  //queues.Where(i => i.Path == QueueName).ToList<QueueDescription>();
+                topics.Add(SbManager.GetTopicByName(TopicName));
             }
             else
             {
-                topics = managementClient.GetTopicsAsync().Result;
+                topics = SbManager.GetAllTopics();
             }
 
             foreach (var topic in topics)
             {
-                IList<SubscriptionDescription> subscriptions = managementClient.GetSubscriptionsAsync(topic.Path).Result;
+                IList<SubscriptionDescription> subscriptions = SbManager.GetAllSubscriptions(topic.Path);
 
-                WriteObject(new SbTopic
+                result.Add(new SbTopic
                 {
                     TopicName = topic.Path,
-                    Subscriptions = subscriptions.Select(sub => sub.SubscriptionName).ToList()                    
+                    Subscriptions = subscriptions.Select(sub => sub.SubscriptionName).ToList()
                 });
             }
+
+            return result;
         }
     }
 }

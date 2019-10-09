@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Management;
+﻿using System.Collections.Generic;
 using System.Management.Automation;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
+using PSServiceBus.Helpers;
 
 namespace PSServiceBus
 {
@@ -18,28 +13,52 @@ namespace PSServiceBus
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = true)]
         public string TopicName { get; set; }
+
+        [Parameter(Mandatory = false)]
+        public string SubscriptionName { get; set; }
 
         protected override void ProcessRecord()
         {
-            IList<SubscriptionDescription> subscriptions = new List<SubscriptionDescription>();
-            ManagementClient managementClient = new ManagementClient(NamespaceConnectionString);
+            SbManager sbManager = new SbManager(NamespaceConnectionString);
 
-            subscriptions = managementClient.GetSubscriptionsAsync(TopicName).Result;
+            var output = BuildSubscriptionList(sbManager, TopicName, SubscriptionName);
 
-            foreach (var sub in subscriptions)
+            foreach (var item in output)
             {
-                SubscriptionRuntimeInfo subscriptionRuntimeInfo = managementClient.GetSubscriptionRuntimeInfoAsync(TopicName, sub.SubscriptionName).Result;
+                WriteObject(item);
+            }
+        }
 
-                WriteObject(new SbSubscription
+        private IList<SbSubscription> BuildSubscriptionList(ISbManager sbManager, string TopicName, string SubscriptionName)
+        {
+            IList<SbSubscription> result = new List<SbSubscription>();
+            IList<SubscriptionDescription> subscriptions = new List<SubscriptionDescription>();
+
+            if (SubscriptionName != null)
+            {
+                subscriptions.Add(sbManager.GetSubscriptionByName(TopicName, SubscriptionName));
+            }
+            else
+            {
+                subscriptions = sbManager.GetAllSubscriptions(TopicName);
+            }
+
+            foreach (var subscription in subscriptions)
+            {
+                SubscriptionRuntimeInfo subscriptionRuntimeInfo = sbManager.GetSubscriptionRuntimeInfo(TopicName, subscription.SubscriptionName);
+
+                result.Add(new SbSubscription
                 {
-                    Name = sub.SubscriptionName,
-                    Topic = sub.TopicPath,
+                    Name = subscription.SubscriptionName,
+                    Topic = subscription.TopicPath,
                     ActiveMessages = subscriptionRuntimeInfo.MessageCountDetails.ActiveMessageCount,
                     DeadLetteredMessages = subscriptionRuntimeInfo.MessageCountDetails.DeadLetterMessageCount
                 });
             }
+
+            return result;
         }
     }
 }

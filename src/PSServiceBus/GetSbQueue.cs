@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Management;
+﻿using System.Collections.Generic;
 using System.Management.Automation;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
 using PSServiceBus.Helpers;
@@ -27,7 +21,7 @@ namespace PSServiceBus
         {
             SbManager sbManager = new SbManager(NamespaceConnectionString);
 
-            var output = ProduceOutput(sbManager, QueueName);
+            var output = BuildQueueList(sbManager, QueueName);
 
             foreach (var item in output)
             {
@@ -35,7 +29,7 @@ namespace PSServiceBus
             }
         }
 
-        private IList<SbQueue> ProduceOutput(ISbManager SbManager, string QueueName)
+        private IList<SbQueue> BuildQueueList(ISbManager SbManager, string QueueName)
         {
             IList<SbQueue> result = new List<SbQueue>();
             IList<QueueDescription> queues = new List<QueueDescription>();
