@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Exceptions;
 using PSServiceBus.Enums;
@@ -129,7 +130,7 @@ namespace PSServiceBus.Helpers
 
         public string BuildSubscriptionPath(string TopicName, string SubscriptionName)
         {
-            return String.Format("{0}/Subscription/{1}", TopicName, SubscriptionName);
+            return EntityNameHelper.FormatSubscriptionPath(TopicName, SubscriptionName);
         }
     }
 }
