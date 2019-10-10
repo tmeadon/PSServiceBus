@@ -5,7 +5,7 @@ using PSServiceBus.Enums;
 namespace PSServiceBus.Cmdlets
 {
     [Cmdlet(VerbsCommunications.Send, "SbMessage")]
-    public class SendSbMessage : Cmdlet
+    public class SendSbMessage : PSCmdlet
     {
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }
@@ -31,15 +31,16 @@ namespace PSServiceBus.Cmdlets
 
         protected override void ProcessRecord()
         {
-            if (QueueName != null)
+            switch (this.ParameterSetName)
             {
-                entityPath = QueueName;
-                entityType = SbEntityTypes.Queue;
-            }
-            else
-            {
-                entityPath = TopicName;
-                entityType = SbEntityTypes.Topic;
+                case "SendToQueue":
+                    entityPath = QueueName;
+                    entityType = SbEntityTypes.Queue;
+                    break;
+                case "SendToTopic":
+                    entityPath = TopicName;
+                    entityType = SbEntityTypes.Topic;
+                    break;
             }
 
             SbManager sbManager = new SbManager(NamespaceConnectionString);
