@@ -10,32 +10,18 @@ namespace PSServiceBus.Helpers
     public class SbSender
     {
         private readonly MessageSender messageSender;
-        public TransportType TransportType;
 
         public SbSender(string NamespaceConnectionString, string EntityPath, SbEntityTypes EntityType, ISbManager sbManager)
         {
             if (sbManager.QueueOrTopicExists(EntityPath, EntityType))
             {
-                string webSocketsConnectionString = SetMessageTransportToWebSockets(NamespaceConnectionString);
-                this.messageSender = new MessageSender(webSocketsConnectionString, EntityPath, null);
-                this.TransportType = messageSender.ServiceBusConnection.TransportType;
+                this.messageSender = new MessageSender(NamespaceConnectionString, EntityPath, null);
+                this.messageSender.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
             }
             else
             {
                 throw new NonExistentEntityException(String.Format("{0} {1} does not exist", EntityType, EntityPath));
             }           
-        }
-
-        private string SetMessageTransportToWebSockets(string connectionString)
-        {
-            if (!connectionString.Contains("TransportType=AmqpWebSockets"))
-            {
-                return connectionString + ";TransportType=AmqpWebSockets";
-            }
-            else
-            {
-                return connectionString;
-            }
         }
 
         public void SendMessage(string MessageBody)
