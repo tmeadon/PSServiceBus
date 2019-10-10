@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Management.Automation;
 using PSServiceBus.Helpers;
-using PSServiceBus.Enums;
 using PSServiceBus.Outputs;
 
 namespace PSServiceBus.Cmdlets
@@ -33,31 +32,19 @@ namespace PSServiceBus.Cmdlets
         [Parameter]
         public int NumberOfMessagesToRetrieve { get; set; } = 1;
 
-        private SbEntityTypes entityType;
-
-        private string entityPath;
-
         protected override void ProcessRecord()
         {
-            // TODO HANDLE SUBSCRIPTIONS
-        
-
-
+            SbReceiver sbReceiver;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
 
-            switch (this.ParameterSetName)
+            if (this.ParameterSetName == "ReceiveFromQueue")
             {
-                case "ReceiveFromQueue":
-                    entityPath = QueueName;
-                    entityType = SbEntityTypes.Queue;
-                    break;
-                case "ReceiveFromSubscription":
-                    entityPath = sbManager.BuildSubscriptionPath(TopicName, SubscriptionName);
-                    entityType = SbEntityTypes.Subscription;
-                    break;
+                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, sbManager);
             }
-
-            SbReceiver sbReceiver = new SbReceiver(NamespaceConnectionString, entityPath, entityType, sbManager);
+            else
+            {
+                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, sbManager);
+            }
 
             IList<SbMessage> messages = sbReceiver.PeekMessages(NumberOfMessagesToRetrieve);
 
