@@ -2,6 +2,7 @@
 using System.Management.Automation;
 using PSServiceBus.Helpers;
 using PSServiceBus.Outputs;
+using PSServiceBus.Enums;
 
 namespace PSServiceBus.Cmdlets
 {
@@ -32,10 +33,14 @@ namespace PSServiceBus.Cmdlets
         [Parameter]
         public int NumberOfMessagesToRetrieve { get; set; } = 1;
 
+        [Parameter]
+        public SbReceiveTypes ReceiveType { get; set; } = SbReceiveTypes.ReceiveAndKeep;
+
         protected override void ProcessRecord()
         {
             SbReceiver sbReceiver;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
+            IList<SbMessage> sbMessages = new List<SbMessage>();
 
             if (this.ParameterSetName == "ReceiveFromQueue")
             {
@@ -46,11 +51,20 @@ namespace PSServiceBus.Cmdlets
                 sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, sbManager);
             }
 
-            IList<SbMessage> messages = sbReceiver.PeekMessages(NumberOfMessagesToRetrieve);
-
-            foreach (SbMessage message in messages)
+            switch (ReceiveType)
             {
-                WriteObject(message);
+                case SbReceiveTypes.ReceiveAndKeep:
+                    sbMessages = sbReceiver.PeekMessages(NumberOfMessagesToRetrieve);
+                    break;
+
+                case SbReceiveTypes.ReceiveAndDelete:
+                    sbMessages = sbReceiver.ReceiveAndDelete(NumberOfMessagesToRetrieve);
+                    break;
+            }
+
+            foreach (SbMessage sbMessage in sbMessages)
+            {
+                WriteObject(sbMessage);
             }
         }
     }
