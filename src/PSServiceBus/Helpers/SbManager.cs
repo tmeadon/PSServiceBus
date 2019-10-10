@@ -113,5 +113,23 @@ namespace PSServiceBus.Helpers
                     return false;
             }
         }
+
+        public bool SubscriptionExists(string TopicName, string SubscriptionName)
+        {
+            try
+            {
+                this.GetSubscriptionByName(TopicName, SubscriptionName);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public string BuildSubscriptionPath(string TopicName, string SubscriptionName)
+        {
+            return String.Format("{0}/Subscription/{1}", TopicName, SubscriptionName);
+        }
     }
 }
