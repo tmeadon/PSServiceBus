@@ -9,7 +9,7 @@ using PSServiceBus.Exceptions;
 
 namespace PSServiceBus.Helpers
 {
-    public class SbReceiver : ISbReceiver
+    public class SbReceiver
     {
         private readonly MessageReceiver messageReceiver;
 
