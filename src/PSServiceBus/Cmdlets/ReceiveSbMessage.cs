@@ -31,10 +31,14 @@ namespace PSServiceBus.Cmdlets
         public string SubscriptionName { get; set; }
 
         [Parameter]
-        public int NumberOfMessagesToRetrieve { get; set; } = 1;
+        public int NumberOfMessagesToRetrieve { get; set; }
 
         [Parameter]
         public SbReceiveTypes ReceiveType { get; set; } = SbReceiveTypes.ReceiveAndKeep;
+
+        [Parameter]
+        public SwitchParameter ReceiveFromDeadLetterQueue { get; set; }
+
 
         protected override void ProcessRecord()
         {
@@ -43,11 +47,11 @@ namespace PSServiceBus.Cmdlets
 
             if (this.ParameterSetName == "ReceiveFromQueue")
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, sbManager);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, ReceiveFromDeadLetterQueue, sbManager);
             }
             else
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, sbManager);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, ReceiveFromDeadLetterQueue, sbManager);
             }
 
             IList<SbMessage> sbMessages = sbReceiver.ReceiveMessages(NumberOfMessagesToRetrieve, ReceiveType);

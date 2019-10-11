@@ -27,5 +27,7 @@ namespace PSServiceBus.Helpers
         bool SubscriptionExists(string TopicName, string SubscriptionName);
 
         string BuildSubscriptionPath(string TopicName, string SubscriptionName);
+
+        string BuildDeadLetterPath(string EntityPath);
     }
 }

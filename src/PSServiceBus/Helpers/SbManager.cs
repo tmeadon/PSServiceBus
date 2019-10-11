@@ -116,5 +116,10 @@ namespace PSServiceBus.Helpers
         {
             return EntityNameHelper.FormatSubscriptionPath(TopicName, SubscriptionName);
         }
+
+        public string BuildDeadLetterPath(string EntityPath)
+        {
+            return EntityNameHelper.FormatDeadLetterPath(EntityPath);
+        }
     }
 }

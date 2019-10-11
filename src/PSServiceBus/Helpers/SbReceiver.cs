@@ -6,6 +6,7 @@ using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Outputs;
 using PSServiceBus.Enums;
 using PSServiceBus.Exceptions;
+using System.Management.Automation;
 
 namespace PSServiceBus.Helpers
 {
@@ -13,11 +14,18 @@ namespace PSServiceBus.Helpers
     {
         private readonly MessageReceiver messageReceiver;
 
-        public SbReceiver(string NamespaceConnectionString, string QueueName, ISbManager sbManager)
+        public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager)
         {
             if (sbManager.QueueOrTopicExists(QueueName, SbEntityTypes.Queue))
             {
-                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, QueueName);
+                string entityPath = QueueName;
+
+                if (ReceiveFromDeadLetter)
+                {
+                    entityPath = sbManager.BuildDeadLetterPath(QueueName);
+                }
+
+                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, entityPath);
             }
             else
             {
@@ -25,12 +33,19 @@ namespace PSServiceBus.Helpers
             }
         }
 
-        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, ISbManager sbManager)
+        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager)
         {
             if (sbManager.SubscriptionExists(TopicName, SubscriptionName))
             {
                 string subscriptionPath = sbManager.BuildSubscriptionPath(TopicName, SubscriptionName);
-                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, subscriptionPath);
+                string entityPath = subscriptionPath;
+
+                if (ReceiveFromDeadLetter)
+                {
+                    entityPath = sbManager.BuildDeadLetterPath(subscriptionPath);
+                }
+
+                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, entityPath);
             }
             else
             {
@@ -54,7 +69,7 @@ namespace PSServiceBus.Helpers
         }
 
         private IList<SbMessage> PeekMessages(int NumberOfMessages)
-        {            
+        {
             IList<Message> messages = messageReceiver.PeekBySequenceNumberAsync(0, NumberOfMessages).Result;
 
             return BuildMessageList(messages);
