@@ -91,25 +91,9 @@ namespace PSServiceBus.Helpers
             switch (entityType)
             {
                 case SbEntityTypes.Queue:
-                    try
-                    {
-                        this.GetQueueByName(entityPath);
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
+                    return managementClient.QueueExistsAsync(entityPath).Result;
                 case SbEntityTypes.Topic:
-                    try
-                    {
-                        this.GetTopicByName(entityPath);
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
+                    return managementClient.TopicExistsAsync(entityPath).Result;
                 default:
                     return false;
             }
