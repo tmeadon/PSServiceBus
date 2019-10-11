@@ -38,14 +38,29 @@ namespace PSServiceBus.Helpers
             }
         }
 
-        public IList<SbMessage> PeekMessages(int NumberOfMessages)
+        public IList<SbMessage> ReceiveMessages(int NumberOfMessages, SbReceiveTypes ReceiveType)
+        {
+            switch (ReceiveType)
+            {
+                case SbReceiveTypes.ReceiveAndKeep:
+                    return this.PeekMessages(NumberOfMessages);
+
+                case SbReceiveTypes.ReceiveAndDelete:
+                    return this.ReceiveAndDelete(NumberOfMessages);
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private IList<SbMessage> PeekMessages(int NumberOfMessages)
         {            
             IList<Message> messages = messageReceiver.PeekBySequenceNumberAsync(0, NumberOfMessages).Result;
 
             return BuildMessageList(messages);
         }
 
-        public IList<SbMessage> ReceiveAndDelete(int NumberOfMessages)
+        private IList<SbMessage> ReceiveAndDelete(int NumberOfMessages)
         { 
             IList<Message> messages = messageReceiver.ReceiveAsync(NumberOfMessages).Result;
 

@@ -40,7 +40,6 @@ namespace PSServiceBus.Cmdlets
         {
             SbReceiver sbReceiver;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
-            IList<SbMessage> sbMessages = new List<SbMessage>();
 
             if (this.ParameterSetName == "ReceiveFromQueue")
             {
@@ -51,16 +50,7 @@ namespace PSServiceBus.Cmdlets
                 sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, sbManager);
             }
 
-            switch (ReceiveType)
-            {
-                case SbReceiveTypes.ReceiveAndKeep:
-                    sbMessages = sbReceiver.PeekMessages(NumberOfMessagesToRetrieve);
-                    break;
-
-                case SbReceiveTypes.ReceiveAndDelete:
-                    sbMessages = sbReceiver.ReceiveAndDelete(NumberOfMessagesToRetrieve);
-                    break;
-            }
+            IList<SbMessage> sbMessages = sbReceiver.ReceiveMessages(NumberOfMessagesToRetrieve, ReceiveType);
 
             foreach (SbMessage sbMessage in sbMessages)
             {
