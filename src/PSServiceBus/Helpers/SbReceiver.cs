@@ -70,8 +70,22 @@ namespace PSServiceBus.Helpers
 
         private IList<SbMessage> PeekMessages(int NumberOfMessages)
         {
-            IList<Message> messages = messageReceiver.PeekBySequenceNumberAsync(0, NumberOfMessages).Result;
+            IList<Message> messages = new List<Message>();
 
+            for (int i = 0; i < NumberOfMessages; i++)
+            {
+                Message message = messageReceiver.PeekBySequenceNumberAsync((messageReceiver.LastPeekedSequenceNumber + 1)).Result;
+
+                if (message != null)
+                {
+                    messages.Add(message);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
             return BuildMessageList(messages);
         }
 
