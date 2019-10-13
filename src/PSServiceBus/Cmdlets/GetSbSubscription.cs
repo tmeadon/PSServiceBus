@@ -13,7 +13,8 @@ namespace PSServiceBus.Cmdlets
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }
 
-        [Parameter(Mandatory = true)]
+        [Parameter(Mandatory = true,
+                   ValueFromPipelineByPropertyName = true)]
         public string TopicName { get; set; }
 
         [Parameter(Mandatory = false)]
