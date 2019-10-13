@@ -91,7 +91,21 @@ namespace PSServiceBus.Helpers
 
         private IList<SbMessage> ReceiveAndDelete(int NumberOfMessages)
         { 
-            IList<Message> messages = messageReceiver.ReceiveAsync(NumberOfMessages).Result;
+            IList<Message> messages = new List<Message>();
+
+            for (int i = 0; i < NumberOfMessages; i++)
+            {
+                Message message = messageReceiver.ReceiveAsync().Result;
+
+                if (message != null)
+                {
+                    messages.Add(message);
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             return BuildMessageList(messages);
         }
