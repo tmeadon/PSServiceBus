@@ -6,7 +6,6 @@ using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Outputs;
 using PSServiceBus.Enums;
 using PSServiceBus.Exceptions;
-using System.Management.Automation;
 
 namespace PSServiceBus.Helpers
 {
@@ -90,7 +89,7 @@ namespace PSServiceBus.Helpers
         }
 
         private IList<SbMessage> ReceiveAndDelete(int NumberOfMessages)
-        { 
+        {
             IList<Message> messages = new List<Message>();
 
             for (int i = 0; i < NumberOfMessages; i++)
@@ -100,6 +99,7 @@ namespace PSServiceBus.Helpers
                 if (message != null)
                 {
                     messages.Add(message);
+                    messageReceiver.CompleteAsync(message.SystemProperties.LockToken);
                 }
                 else
                 {
@@ -112,7 +112,7 @@ namespace PSServiceBus.Helpers
 
         private MessageReceiver CreateMessageReceiver(string NamespaceConnectionString, string EntityPath)
         {
-            MessageReceiver messageReceiver = new MessageReceiver(NamespaceConnectionString, EntityPath, ReceiveMode.ReceiveAndDelete);
+            MessageReceiver messageReceiver = new MessageReceiver(NamespaceConnectionString, EntityPath);
             messageReceiver.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
             return messageReceiver;
         }
