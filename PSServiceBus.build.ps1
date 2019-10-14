@@ -1,12 +1,12 @@
-task Clean {
-    if (Test-Path -Path .\output -PathType Leaf)
+task CleanModule {
+    if (Test-Path -Path .\output -PathType Container)
     {
         Remove-Item -Path '.\output' -Recurse
     }
     dotnet.exe clean .\src\PSServiceBus.sln -c release
 }
 
-task Build {
+task BuildModule {
     dotnet.exe build .\src\PSServiceBus.sln -c release
 }
 
@@ -17,4 +17,13 @@ task CopyFiles {
     Copy-Item -Path '.\functions' -Destination '.\output\PSServiceBus\functions' -Recurse
 }
 
-task . Clean, Build, CopyFiles
+task CleanTests {
+    dotnet.exe clean .\tests\utils\PSServiceBus.Tests.Utils.sln -c release
+}
+
+task BuildTests {
+    dotnet.exe build .\tests\utils\PSServiceBus.Tests.Utils.sln -c release
+}
+
+task . CleanModule, BuildModule, CopyFiles, CleanTests, BuildTests
+task testsonly CleanTests, BuildTests
