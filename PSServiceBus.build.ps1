@@ -1,5 +1,8 @@
 task Clean {
-    Remove-Item -Path '.\output' -Recurse
+    if (Test-Path -Path .\output -PathType Leaf)
+    {
+        Remove-Item -Path '.\output' -Recurse
+    }
     dotnet.exe clean .\src\PSServiceBus.sln -c release
 }
 
