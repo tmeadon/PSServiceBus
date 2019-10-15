@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Azure.ServiceBus.Management;
 
@@ -19,6 +20,20 @@ namespace PSServiceBus.Tests.Utils
         public void CreateQueue(string QueueName)
         {
             this.managementClient.CreateQueueAsync(QueueName);
+        }
+
+        public List<string> CreateQueues(int NumberToCreate)
+        {
+            List<string> queues = new List<string>();
+
+            for (int i = 0; i < NumberToCreate; i++)
+            {
+                var guid = Guid.NewGuid().ToString();
+                this.CreateQueue(guid);
+                queues.Add(guid);
+            }
+
+            return queues;
         }
 
         public void RemoveQueue(string QueueName)
