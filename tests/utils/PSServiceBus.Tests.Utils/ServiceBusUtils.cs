@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.Azure.ServiceBus.Management;
 
 namespace PSServiceBus.Tests.Utils
@@ -23,6 +24,11 @@ namespace PSServiceBus.Tests.Utils
         public void RemoveQueue(string QueueName)
         {
             this.managementClient.DeleteQueueAsync(QueueName);
+        }
+
+        public IList<QueueDescription> GetAllQueues()
+        {
+            return this.managementClient.GetQueuesAsync().Result;
         }
     }
 }
