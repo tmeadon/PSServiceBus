@@ -1,5 +1,8 @@
 function Initialize-IntegrationTestRun
 {
+    #Requires -Module Az.Resources
+    #Requires -Module Az.ServiceBus
+    
     [CmdletBinding(SupportsShouldProcess)]
     Param
     (
@@ -54,6 +57,8 @@ function Initialize-IntegrationTestRun
 
 function Complete-IntegrationTestRun
 {
+    #Requires -Module Az.Resources 
+
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     Param
     (
