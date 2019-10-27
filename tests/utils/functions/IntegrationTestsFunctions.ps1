@@ -72,6 +72,6 @@ function Complete-IntegrationTestRun
 
     if ($PSCmdlet.ShouldProcess($resourceGroup.ResourceGroupName))
     {
-        Remove-AzResourceGroup -Name $resourceGroup.ResourceGroupName -Force
+        Remove-AzResourceGroup -Name $resourceGroup.ResourceGroupName -Force | Out-Null
     }
 }
