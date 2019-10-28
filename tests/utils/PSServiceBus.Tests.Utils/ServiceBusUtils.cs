@@ -57,5 +57,13 @@ namespace PSServiceBus.Tests.Utils
             Message message = new Message(body);
             sender.SendAsync(message);
         }
+
+        public void ReceiveAndDeadLetterAMessage(string entityName)
+        {
+            MessageReceiver receiver = new MessageReceiver(this.NamespaceConnectionString, entityName);
+            receiver.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
+            Message message = receiver.ReceiveAsync().Result;
+            receiver.DeadLetterAsync(message.SystemProperties.LockToken);
+        }
     }
 }
