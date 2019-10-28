@@ -24,6 +24,16 @@ namespace PSServiceBus.Tests.Utils
             this.managementClient.CreateQueueAsync(QueueName);
         }
 
+        public void CreateTopic(string TopicName)
+        {
+            this.managementClient.CreateTopicAsync(TopicName);
+        }
+
+        public void CreateSubscription(string TopicName, string SubscriptionName)
+        {
+            this.managementClient.CreateSubscriptionAsync(TopicName, SubscriptionName);
+        }
+
         public List<string> CreateQueues(int NumberToCreate)
         {
             List<string> queues = new List<string>();
@@ -36,6 +46,34 @@ namespace PSServiceBus.Tests.Utils
             }
 
             return queues;
+        }
+
+        public List<string> CreateTopics(int NumberToCreate)
+        {
+            List<string> topics = new List<string>();
+
+            for (int i = 0; i < NumberToCreate; i++)
+            {
+                var guid = Guid.NewGuid().ToString();
+                this.CreateTopic(guid);
+                topics.Add(guid);
+            }
+
+            return topics;
+        }
+
+        public List<string> CreateSubscriptions(string TopicName, int NumberToCreate)
+        {
+            List<string> subscriptions = new List<string>();
+
+            for (int i = 0; i < NumberToCreate; i++)
+            {
+                var guid = Guid.NewGuid().ToString();
+                this.CreateSubscription(TopicName, guid);
+                subscriptions.Add(guid);
+            }
+
+            return subscriptions;
         }
 
         public void RemoveQueue(string QueueName)
@@ -64,6 +102,11 @@ namespace PSServiceBus.Tests.Utils
             receiver.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
             Message message = receiver.ReceiveAsync().Result;
             receiver.DeadLetterAsync(message.SystemProperties.LockToken);
+        }
+
+        public string BuildSubscriptionPath(string TopicName, string SubscriptionName)
+        {
+            return EntityNameHelper.FormatSubscriptionPath(TopicName, SubscriptionName);
         }
     }
 }
