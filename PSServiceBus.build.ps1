@@ -25,5 +25,9 @@ task BuildTests {
     dotnet.exe build .\tests\utils\PSServiceBus.Tests.Utils.sln -c release
 }
 
-task . CleanModule, BuildModule, CopyFiles, CleanTests, BuildTests
+task RunTests {
+    .\tests\integration\Start-Tests.ps1 -Verbose
+}
+
+task . CleanModule, BuildModule, CopyFiles, CleanTests, BuildTests, RunTests
 task testsonly CleanTests, BuildTests
