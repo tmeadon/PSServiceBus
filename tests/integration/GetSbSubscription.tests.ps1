@@ -51,7 +51,7 @@ Describe "Get-SbSubscription tests" {
 
     # tests
 
-    Context "Generic tests" {
+    Context "Pipeline tests" {
 
         It "should accept value from pipeline by property name for the -TopicName parameter" {
 
@@ -69,10 +69,6 @@ Describe "Get-SbSubscription tests" {
         }
 
         It "should return the correct number of dead lettered messages in all subscriptions" {
-
-        }
-
-        It "should accept pipeline input by property name for the TopicName parameter" {
 
         }
     }
