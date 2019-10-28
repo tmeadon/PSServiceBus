@@ -81,6 +81,11 @@ namespace PSServiceBus.Tests.Utils
             this.managementClient.DeleteQueueAsync(QueueName);
         }
 
+        public void RemoveTopic(string TopicName)
+        {
+            this.managementClient.DeleteTopicAsync(TopicName);
+        }
+
         public IList<QueueDescription> GetAllQueues()
         {
             return this.managementClient.GetQueuesAsync().Result;
