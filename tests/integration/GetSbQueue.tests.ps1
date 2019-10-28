@@ -7,7 +7,7 @@ param (
 
 Describe "Get-SbQueue tests" {
 
-    # setup 
+    # setup
 
     # create some queues and wait for the creation to take place
     $newQueues = $ServiceBusUtils.CreateQueues(4)
@@ -34,10 +34,10 @@ Describe "Get-SbQueue tests" {
     # tests
 
     Context "Test without -QueueName parameter" {
-        
+
         $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString
 
-        It "should return all of the queues if -QueueName parameter is not specified" {  
+        It "should return all of the queues if -QueueName parameter is not specified" {
             $result.count | Should -EQ $newQueues.count
         }
 
@@ -85,7 +85,7 @@ Describe "Get-SbQueue tests" {
             $result.DeadLetteredMessages | Should -EQ $messagesToDeadLetter
         }
     }
-   
+
     # tear down queues created for test
 
     foreach ($item in $newQueues)

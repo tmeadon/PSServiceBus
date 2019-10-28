@@ -28,7 +28,6 @@ Invoke-Pester -Script @{
     }
 }
 
-
 # tear down environment
 Write-Verbose -Message 'Removing test environment'
 
