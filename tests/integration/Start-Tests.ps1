@@ -1,6 +1,9 @@
 [CmdletBinding()]
 Param ()
 
+# start a stopwatch to time test run
+$stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
 # load required modules and functions
 Import-Module -Name Pester -RequiredVersion 4.9.0
 Import-Module -Name Az.Resources
@@ -18,18 +21,20 @@ Write-Verbose -Message "Created environment $( $testEnvironment | ConvertTo-Json
 
 $sbUtils = [PSServiceBus.Tests.Utils.ServiceBusUtils]::new($testEnvironment.ConnectionString)
 
-# run tests
-foreach ($file in (Get-ChildItem -Path $PSScriptRoot -Filter '*.tests.ps1'))
-{
-    Invoke-Pester -Script @{
-        Path = $file.FullName
-        Parameters = @{
-            ServiceBusUtils = $sbUtils
-        }
+Invoke-Pester -Script @{
+    Path = $PSScriptRoot
+    Parameters = @{
+        ServiceBusUtils = $sbUtils
     }
 }
+
 
 # tear down environment
 Write-Verbose -Message 'Removing test environment'
 
 Complete-IntegrationTestRun -ResourceGroupName $testEnvironment.ResourceGroupName -Confirm:$false
+
+# report on test run duration
+$stopwatch.Stop()
+
+Write-Verbose -Message "Integration test run completed in $( $stopwatch.Elapsed.ToString() )"
