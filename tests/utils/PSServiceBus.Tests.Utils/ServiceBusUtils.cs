@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Text;
 using System.Collections.Generic;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
 using Microsoft.Azure.ServiceBus.Management;
 
 namespace PSServiceBus.Tests.Utils
@@ -44,6 +46,16 @@ namespace PSServiceBus.Tests.Utils
         public IList<QueueDescription> GetAllQueues()
         {
             return this.managementClient.GetQueuesAsync().Result;
+        }
+
+        public void SendTestMessage(string entityName)
+        {
+            MessageSender sender = new MessageSender(this.NamespaceConnectionString, entityName, null);
+            sender.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
+            var guid = Guid.NewGuid().ToString();
+            byte[] body = Encoding.UTF8.GetBytes("{ 'id': '" + guid + "' }");
+            Message message = new Message(body);
+            sender.SendAsync(message);
         }
     }
 }
