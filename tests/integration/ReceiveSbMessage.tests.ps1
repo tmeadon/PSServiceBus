@@ -82,11 +82,15 @@ Describe "Receive-SbMessage tests" {
         }
 
         It "should leave messages in the queue after being received if -ReceiveType is not supplied" {
-
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queues[2] -NumberOfMessagesToRetrieve 2
+            $ServiceBusUtils.GetQueueRuntimeInfo($queues[2]).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
         }
 
         It "should remove messages from the queue after being received if -ReceiveType ReceiveAndDelete is supplied" {
-
+            $messagesToRemove = 2
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queues[2] -NumberOfMessagesToRetrieve $messagesToRemove -ReceiveType ReceiveAndDelete
+            start-sleep -Seconds 1
+            $ServiceBusUtils.GetQueueRuntimeInfo($queues[2]).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter - $messagesToRemove)
         }
 
         It "should receive messages from the dead letter queue if -ReceiveFromDeadLetterQueue is supplied" {
