@@ -45,6 +45,9 @@ function Initialize-IntegrationTestRun
         $authRule = Get-AzServiceBusAuthorizationRule -ResourceGroupName $resourceGroup.ResourceGroupName -Namespace $namespace.Name | Where-Object {$_.Rights -contains 'Manage'}
         $connectionString = (Get-AzServiceBusKey -ResourceGroupName $resourceGroup.ResourceGroupName -Namespace $namespace.Name -Name ($authRule[0]).Name).PrimaryConnectionString
 
+        # allow some time for the environment provisioning to complete
+        Start-Sleep -Seconds 5
+
         # return namespace details
         return [PSCustomObject]@{
             Subscription = $subscription
