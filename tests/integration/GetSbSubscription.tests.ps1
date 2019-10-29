@@ -5,6 +5,10 @@ param (
     $ServiceBusUtils
 )
 
+import-module E:\Repos\PSServiceBus\tests\utils\PSServiceBus.Tests.Utils\bin\Release\netstandard2.0\PSServiceBus.Tests.Utils.dll
+import-module 'E:\Repos\PSServiceBus\output\PSServiceBus\PSServiceBus.psd1'
+$ServiceBusUtils = [PSServiceBus.Tests.Utils.ServiceBusUtils]::new('Endpoint=sb://b30c5e47-b910-42b5-98a6-49e6aab11abb.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Jnmki7W6UGKYT/xY7MYEvIlHeNpclaQqy2O8pFQGjd0=')
+
 Describe "Get-SbSubscription tests" {
 
     # setup
@@ -49,22 +53,13 @@ Describe "Get-SbSubscription tests" {
         }
     }
 
-    # prepare some test cases 
-
-    $testCases = @()
-    foreach ($topic in $topics)
-    {
-        $testCases += @{
-            TopicName = $topic.TopicName
-            Subscriptions = $topic.Subscriptions
-        }
-    }
-
     # tests
 
     Context "Pipeline input tests" {
 
         $result = $topics | Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString
+
+        $testCases = @( foreach ($topic in $topics) { @{TopicName = $topic.TopicName} } ) 
 
         It "should return results for each TopicName piped in" -TestCases $testCases {
             param ([string] $topicName)
@@ -73,32 +68,52 @@ Describe "Get-SbSubscription tests" {
     }
 
     Context "Test without -SubscriptionName parameter" {
+
+        $testTopic = $topics[0]
+
+        $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName
         
         It "should return all of the subscriptions in a topic" {
-            
+            $result.count | Should -Be $testTopic.Subscriptions.count
         }
 
         It "should return the correct number of active messages in all subscriptions" {
-
+            foreach ($item in $result)
+            {
+                $item.ActiveMessages | Should -Be ($messagesToSendToEachQueue - $messagesToDeadLetter)
+            }
         }
 
         It "should return the correct number of dead lettered messages in all subscriptions" {
-
+            foreach ($item in $result)
+            {
+                $item.DeadLetteredMessages | Should -Be $messagesToDeadLetter
+            }
         }
     }
 
     Context "Tests with -SubscriptionName parameter" {
 
-        It "should return the correct subscription" {
+        $testTopic = $topics[0]
 
+        $testCases = @( foreach ($sub in $testTopic.Subscriptions) { @{Subscription = $sub} } )
+
+        It "should return the correct subscription" -TestCases $testCases {
+            param ([string] $subscription)
+            $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName -SubscriptionName $subscription
+            $result.Name | Should -Be $subscription
         }
 
-        It "should return the correct number of active messages in a specific subscription" {
-
+        It "should return the correct number of active messages in a specific subscription" -TestCases $testCases {
+            param ([string] $subscription)
+            $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName -SubscriptionName $subscription
+            $result.ActiveMessages | Should -Be ($messagesToSendToEachQueue - $messagesToDeadLetter)
         }
 
-        It "should return the correct number of dead lettered messages in a specific subscription" {
-
+        It "should return the correct number of dead lettered messages in a specific subscription" -TestCases $testCases {
+            param ([string] $subscription)
+            $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName -SubscriptionName $subscription
+            $result.DeadLetteredMessages | Should -Be $messagesToDeadLetter
         }
     }
 
