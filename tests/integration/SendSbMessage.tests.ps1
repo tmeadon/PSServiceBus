@@ -5,10 +5,6 @@ param (
     $ServiceBusUtils
 )
 
-import-module E:\Repos\PSServiceBus\tests\utils\PSServiceBus.Tests.Utils\bin\Release\netstandard2.0\PSServiceBus.Tests.Utils.dll
-import-module 'E:\Repos\PSServiceBus\output\PSServiceBus\PSServiceBus.psd1'
-$ServiceBusUtils = [PSServiceBus.Tests.Utils.ServiceBusUtils]::new('Endpoint=sb://b30c5e47-b910-42b5-98a6-49e6aab11abb.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Jnmki7W6UGKYT/xY7MYEvIlHeNpclaQqy2O8pFQGjd0=')
-
 Describe "Send-SbMessage tests" {
 
     # setup
