@@ -18,7 +18,7 @@ Describe "Get-SbSubscription tests" {
     $ServiceBusUtils.CreateTopics($topicsToCreate) | ForEach-Object -Process {
 
         $topic = [PSCustomObject]@{
-            Topic = $_
+            TopicName = $_
             Subscriptions = $ServiceBusUtils.CreateSubscriptions($_, $subscriptionsToCreatePerTopic)
         }
 
@@ -35,12 +35,12 @@ Describe "Get-SbSubscription tests" {
     {
         for ($i = 0; $i -lt $messagesToSendToEachQueue; $i++)
         {
-            $ServiceBusUtils.SendTestMessage($topic.Topic)
+            $ServiceBusUtils.SendTestMessage($topic.TopicName)
         }
 
         foreach ($subscription in $topic.Subscriptions)
         {
-            $subscriptionPath = $ServiceBusUtils.BuildSubscriptionPath($topic.Topic, $subscription)
+            $subscriptionPath = $ServiceBusUtils.BuildSubscriptionPath($topic.TopicName, $subscription)
 
             for ($i = 0; $i -lt $messagesToDeadLetter; $i++)
             {
@@ -49,19 +49,33 @@ Describe "Get-SbSubscription tests" {
         }
     }
 
+    # prepare some test cases 
+
+    $testCases = @()
+    foreach ($topic in $topics)
+    {
+        $testCases += @{
+            TopicName = $topic.TopicName
+            Subscriptions = $topic.Subscriptions
+        }
+    }
+
     # tests
 
-    Context "Pipeline tests" {
+    Context "Pipeline input tests" {
 
-        It "should accept value from pipeline by property name for the -TopicName parameter" {
+        $result = $topics | Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString
 
+        It "should return results for each TopicName piped in" -TestCases $testCases {
+            param ([string] $topicName)
+            $topicName | Should -BeIn $result.Topic
         }
     }
 
     Context "Test without -SubscriptionName parameter" {
-
+        
         It "should return all of the subscriptions in a topic" {
-
+            
         }
 
         It "should return the correct number of active messages in all subscriptions" {
@@ -92,6 +106,8 @@ Describe "Get-SbSubscription tests" {
 
     foreach ($item in $topics)
     {
-        $ServiceBusUtils.RemoveTopic($item.Topic)
+        $ServiceBusUtils.RemoveTopic($item.TopicName)
     }
 }
+
+
