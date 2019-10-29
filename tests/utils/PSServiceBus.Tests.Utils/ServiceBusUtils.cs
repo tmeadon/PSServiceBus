@@ -133,5 +133,14 @@ namespace PSServiceBus.Tests.Utils
         {
             return this.managementClient.GetSubscriptionRuntimeInfoAsync(topicName, subscriptionName).Result;
         }
+
+        public void SendMessage(string entityName, string messageBody)
+        {
+            MessageSender messageSender = new MessageSender(this.NamespaceConnectionString, entityName);
+            messageSender.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
+            byte[] body = Encoding.UTF8.GetBytes(messageBody);
+            Message message = new Message(body);
+            messageSender.SendAsync(message);
+        }
     }
 }
