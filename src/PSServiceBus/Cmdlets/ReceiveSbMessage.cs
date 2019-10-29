@@ -31,7 +31,7 @@ namespace PSServiceBus.Cmdlets
         public string SubscriptionName { get; set; }
 
         [Parameter]
-        public int NumberOfMessagesToRetrieve { get; set; }
+        public int NumberOfMessagesToRetrieve { get; set; } = 1;
 
         [Parameter]
         public SbReceiveTypes ReceiveType { get; set; } = SbReceiveTypes.ReceiveAndKeep;
