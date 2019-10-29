@@ -101,6 +101,16 @@ namespace PSServiceBus.Tests.Utils
             sender.SendAsync(message);
         }
 
+        public string ReceiveAndCompleteAMessage(string entityName)
+        {
+            MessageReceiver receiver = new MessageReceiver(this.NamespaceConnectionString, entityName);
+            receiver.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
+            Message message = receiver.ReceiveAsync().Result;
+            receiver.DeadLetterAsync(message.SystemProperties.LockToken);
+            string bodyStr = Encoding.UTF8.GetString(message.Body);
+            return bodyStr;
+        }
+
         public void ReceiveAndDeadLetterAMessage(string entityName)
         {
             MessageReceiver receiver = new MessageReceiver(this.NamespaceConnectionString, entityName);
@@ -112,6 +122,11 @@ namespace PSServiceBus.Tests.Utils
         public string BuildSubscriptionPath(string TopicName, string SubscriptionName)
         {
             return EntityNameHelper.FormatSubscriptionPath(TopicName, SubscriptionName);
+        }
+
+        public QueueRuntimeInfo GetQueueRuntimeInfo(string queueName)
+        {
+            return this.managementClient.GetQueueRuntimeInfoAsync(queueName).Result;
         }
     }
 }
