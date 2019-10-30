@@ -30,4 +30,7 @@ task RunTests {
 }
 
 task . CleanModule, BuildModule, CopyFiles, CleanTests, BuildTests, RunTests
-task testsonly CleanTests, BuildTests
+task buildmoduleonly CleanModule, BuildModule, CopyFiles
+task buildtestsonly CleanTests, BuildTests
+task runtestsonly RunTests
+
