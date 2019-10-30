@@ -71,30 +71,38 @@ Describe "Receive-SbMessage tests" {
     Context "Test receiving from a queue" {
 
         It "should receive a single message if -NumberOfMessagesToRetrieve is not supplied" {
-            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queues[0]
+            $queue = $queues[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
             $result.count | Should -Be 1
         }
 
         It "should receive the correct number of messages if -NumberOfMessagesToRetrieve is supplied" -TestCases @{messages = 2}, @{messages = 3} {
             param ([int] $messages)
-            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queues[1] -NumberOfMessagesToRetrieve $messages
+            $queue = $queues[1]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve $messages
             $result.count | Should -Be $messages
         }
 
         It "should leave messages in the queue after being received if -ReceiveType is not supplied" {
-            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queues[2] -NumberOfMessagesToRetrieve 2
-            $ServiceBusUtils.GetQueueRuntimeInfo($queues[2]).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
+            $queue = $queues[2]
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve 2
+            $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
         }
 
         It "should remove messages from the queue after being received if -ReceiveType ReceiveAndDelete is supplied" {
+            $queue = $queues[2]
             $messagesToRemove = 2
-            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queues[2] -NumberOfMessagesToRetrieve $messagesToRemove -ReceiveType ReceiveAndDelete
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve $messagesToRemove -ReceiveType ReceiveAndDelete
             start-sleep -Seconds 1
-            $ServiceBusUtils.GetQueueRuntimeInfo($queues[2]).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter - $messagesToRemove)
+            $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter - $messagesToRemove)
         }
 
         It "should receive messages from the dead letter queue if -ReceiveFromDeadLetterQueue is supplied" {
-
+            $queue = $queues[3]
+            $messagesToReceive = 1
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve $messagesToReceive -ReceiveType ReceiveAndDelete -ReceiveFromDeadLetterQueue
+            Start-Sleep -Seconds 1
+            $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.DeadLetterMessageCount | Should -Be ($messagesToDeadLetter - $messagesToReceive)
         }
     }
 
