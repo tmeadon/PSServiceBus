@@ -7,6 +7,8 @@ param (
 
 Describe "Receive-SbMessage tests" {
 
+    # setup
+
     # create some queues, topics and subscriptions and allow time for it to complete 
 
     $queues = $ServiceBusUtils.CreateQueues(4)
@@ -52,6 +54,8 @@ Describe "Receive-SbMessage tests" {
             $ServiceBusUtils.ReceiveAndDeadLetterAMessage($subscriptionPath)
         }
     }
+
+    # tests
 
     Context "Test parameter attributes" {
 
@@ -109,23 +113,38 @@ Describe "Receive-SbMessage tests" {
     Context "Test receiving from a subscription" {
 
         It "should receive a single message if -NumberOfMessagesToRetrieve is not supplied" {
-
+            $subscription = $subscriptions[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription
+            $result.count | Should -Be 1
         }
 
-        It "should receive the correct number of messages if -NumberOfMessagesToRetrieve is supplied" {
-
+        It "should receive the correct number of messages if -NumberOfMessagesToRetrieve is supplied" -TestCases @{messages = 2}, @{messages = 3} {
+            param ([int] $messages)
+            $subscription = $subscriptions[1]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -NumberOfMessagesToRetrieve $messages
+            $result.count | Should -Be $messages
         }
 
         It "should leave messages in the subscription after being received if -ReceiveType is not supplied" {
-
+            $subscription = $subscriptions[2]
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -NumberOfMessagesToRetrieve 2
+            $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $subscription).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
         }
 
         It "should remove messages from the subscription after being received if -ReceiveType ReceiveAndDelete is supplied" {
-
+            $subscription = $subscriptions[2]
+            $messagesToRemove = 2
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -NumberOfMessagesToRetrieve $messagesToRemove -ReceiveType ReceiveAndDelete
+            start-sleep -Seconds 1
+            $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $subscription).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter - $messagesToRemove)
         }
 
         It "should receive messages from the dead letter queue if -ReceiveFromDeadLetterQueue is supplied" {
-
+            $subscription = $subscriptions[3]
+            $messagesToReceive = 1
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -NumberOfMessagesToRetrieve $messagesToReceive -ReceiveType ReceiveAndDelete -ReceiveFromDeadLetterQueue
+            Start-Sleep -Seconds 1
+            $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $subscription).MessageCountDetails.DeadLetterMessageCount | Should -Be ($messagesToDeadLetter - $messagesToReceive)
         }
     }
 
