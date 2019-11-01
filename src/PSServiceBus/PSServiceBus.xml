@@ -1,0 +1,366 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PSServiceBus</name>
+    </assembly>
+    <members>
+        <member name="T:PSServiceBus.Cmdlets.GetSbQueue">
+            <summary>
+            <para type="synopsis">Gets a queue by name or a list of all queues from an Azure Service Bus Namespace.  Returns the number of messages in the active and dead letter queues.</para>
+            <para type="description">Gets a queue by name or a list of all queues from an Azure Service Bus Namespace.  Returns the number of messages in the active and dead letter queues.</para>
+            </summary>
+            <example>
+            <code>Get-SbQueue -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue'</code>
+            <para>This gets information about a single queue called 'example-queue'.</para>
+            </example>
+            <example>
+            <code>Get-SbQueue -NamespaceConnectionString $namespaceConnectionString</code>
+            <para>This gets information about all queues.</para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.GetSbQueue.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.GetSbQueue.QueueName">
+            <summary>
+            <para type="description">The name of the queue to retrieve.  All queues are returned if not specified.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.GetSbQueue.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Cmdlets.GetSbSubscription">
+            <summary>
+            <para type="synopsis">Gets a subscription by name or a list of all subscriptions in an from an Azure Service Bus Topic.  Returns the number of messages in the active and dead letter queues.</para>
+            <para type="description">Gets a subscription by name or a list of all subscriptions in an from an Azure Service Bus Topic.  Returns the number of messages in the active and dead letter queues.</para>
+            </summary>
+            <example>
+            <code>Get-SbSubscription -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription'</code>
+            <para>This gets information about a single subscription called 'example-subscription' in a topic called 'example-topic'.</para>
+            </example>
+            <example>
+            <code>Get-SbSubscription -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic'</code>
+            <para>This gets information about all subscriptions in a topic called 'example-topic'.</para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.GetSbSubscription.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.GetSbSubscription.TopicName">
+            <summary>
+            <para type="description">Name of the topic to retrieve subscriptions from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.GetSbSubscription.SubscriptionName">
+            <summary>
+            <para type="description">Name of a specific subscription to retrieve.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.GetSbSubscription.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Cmdlets.GetSbTopic">
+            <summary>
+            <para type="synopsis">Gets a topic by name or a list of all topics from an Azure Service Bus Namespace.  Returns the names of the subscriptions in the retrieved topic(s).</para>
+            <para type="description">Gets a topic by name or a list of all topics from an Azure Service Bus Namespace.  Returns the names of the subscriptions in the retrieved topic(s).</para>
+            </summary>
+            <example>
+            <code>Get-SbTopic -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic'</code>
+            <para>This gets information about a single topic called 'example-topic'.</para>
+            </example>
+            <example>
+            <code>Get-SbTopic -NamespaceConnectionString $namespaceConnectionString</code>
+            <para>This gets information about all topics.</para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.GetSbTopic.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.GetSbTopic.TopicName">
+            <summary>
+            <para type="description">The name of the topic to retrieve.  All topics are returned if not specified.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.GetSbTopic.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Cmdlets.ReceiveSbMessage">
+            <summary>
+            <para type="synopsis">Receives a message or messages from an Azure Service Bus queue or subscription.</para>
+            <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription.  Two receive modes are available:</para>
+            <para type="description">ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
+            <para type="description">received using the -NumberOfMessagesToRetrieve parameter, they will be returned individually to the pipeline.  Messages can also be</para>
+            <para type="description">received from the dead letter queue by adding the -ReceiveFromDeadLetterQueue parameter.</para>
+            </summary>
+            <example>
+            <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue'</code>
+            <para>Receives a single message from the queue 'example-queue' and leaves it there</para>
+            <para></para>
+            </example>
+            <example>
+            <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription' -NumberOfMessagesToRetrieve 5</code>
+            <para>Receives 5 messages from the subscription called 'example-subscription' in the topic 'example-topic' and leaves them there</para>
+            <para></para>
+            </example>
+            <example>
+            <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue' -ReceiveType ReceiveAndDelete</code>
+            <para>Receives a single message from the queue 'example-queue' and removes it from the queue</para>
+            <para></para>
+            </example>
+            <example>
+            <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue' -ReceiveFromDeadLetterQueue</code>
+            <para>Receives a single message from the dead letter queue for queue 'example-queue' and leaves it there</para>
+            <para></para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.QueueName">
+            <summary>
+            <para type="description">The name of the queue to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.TopicName">
+            <summary>
+            <para type="description">The name of the topic containing the subscription to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.SubscriptionName">
+            <summary>
+            <para type="description">The name of the subscription to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.NumberOfMessagesToRetrieve">
+            <summary>
+            <para type="description">The number of messages to retrieve - defaults to 1.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.ReceiveType">
+            <summary>
+            <para type="description">Specifies the receive behaviour - defaults to ReceiveAndKeep.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.ReceiveFromDeadLetterQueue">
+            <summary>
+            <para type="description">Retrieves messages from the entity's dead letter queue.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.ReceiveSbMessage.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Cmdlets.SendSbMessage">
+            <summary>
+            <para type="synopsis">Sends a message to an Azure Service Bus queue or topic.</para>
+            <para type="description">Sends a message to an Azure Service Bus queue or topic.</para>
+            </summary>
+            <example>
+            <code>Send-SbMessage -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue'  -Message '{ "example": "message" }'</code>
+            <para>This sends a message to the queue 'example-queue' with body '{ "example": "message" }'.</para>
+            </example>
+            <example>
+            <code>Send-SbMessage -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic'  -Message '{ "example": "message" }'</code>
+            <para>This sends a message to the topic 'example-topic' with body '{ "example": "message" }'.</para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessage.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessage.QueueName">
+            <summary>
+            <para type="description">Name of the queue to send a message to.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessage.TopicName">
+            <summary>
+            <para type="description">Name of the topic to send a message to.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessage.Message">
+            <summary>
+            <para type="description">Body of the message to send.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.SendSbMessage.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Cmdlets.TestSbConnectionString">
+            <summary>
+            <para type="synopsis">Tests whether a connection string is valid or not.</para>
+            <para type="description">Tests whether a connection string is valid or not.</para>
+            </summary>
+            <example>
+            <code>Test-SbConnectionString -NamespaceConnectionString $namespaceConnectionString</code>
+            <para>This tests whether $namespaceConnectionString is valid or not.</para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.TestSbConnectionString.NamespaceConnectionString">
+            <summary>
+            <para type="description">Connection string to test.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.TestSbConnectionString.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Enums.SbEntityTypes">
+            <summary>
+            Valid Service Bus entities
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbEntityTypes.Queue">
+            <summary>
+            A Service Bus Queue
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbEntityTypes.Topic">
+            <summary>
+            A Service Bus Topic
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbEntityTypes.Subscription">
+            <summary>
+            A Service Bus Subscription
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Enums.SbReceiveTypes">
+            <summary>
+            <para type="description">Valid ways to receive a message from a Service Bus entity</para>
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbReceiveTypes.ReceiveAndDelete">
+            <summary>
+            Removes the message from the entity after receiving
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbReceiveTypes.ReceiveAndKeep">
+            <summary>
+            Leaves the message in the entity after receiving
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Exceptions.NonExistentEntityException">
+            <summary>
+            Tells the user that the Service Bus entity doesn't exist
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Exceptions.NonExistentEntityException.#ctor">
+            <summary>
+            Basic constructor
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Exceptions.NonExistentEntityException.#ctor(System.String)">
+            <summary>
+            This constructor allows control of the exception message
+            </summary>
+            <param name="message">Message to insert into the exception</param>
+        </member>
+        <member name="T:PSServiceBus.Helpers.ISbManager">
+            <summary></summary>
+        </member>
+        <member name="T:PSServiceBus.Helpers.SbManager">
+            <summary></summary>
+        </member>
+        <member name="T:PSServiceBus.Helpers.SbReceiver">
+            <summary></summary>
+        </member>
+        <member name="T:PSServiceBus.Helpers.SbSender">
+            <summary></summary>
+        </member>
+        <member name="T:PSServiceBus.Outputs.SbMessage">
+            <summary>
+            Contains the id and the body for a service bus message
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessage.MessageId">
+            <summary>
+            Message ID
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessage.MessageBody">
+            <summary>
+            Message body
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Outputs.SbQueue">
+            <summary>
+            <para type="description">Contains the name of a queue and the number of messages in the 'active' and 'dead letter' queues.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbQueue.Name">
+            <summary>
+            Name of the queue
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbQueue.ActiveMessages">
+            <summary>
+            Number of messages in the active queue
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbQueue.DeadLetteredMessages">
+            <summary>
+            Number of messages in the dead letter queue
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Outputs.SbSubscription">
+            <summary>
+            <para type="description">Contains the name of a subscription, the name of the containing topic, and the number of messages in the 'active' and 'dead letter' queues.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbSubscription.Name">
+            <summary>
+            Name of the subscription
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbSubscription.Topic">
+            <summary>
+            Name of the topic
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbSubscription.ActiveMessages">
+            <summary>
+            Number of messages in the active queue
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbSubscription.DeadLetteredMessages">
+            <summary>
+            Number of messages in the dead letter queue
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Outputs.SbTopic">
+            <summary>
+            <para type="description">Contains the name of a topic and a list of its subscriptions.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbTopic.TopicName">
+            <summary>
+            Name of the topic
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbTopic.Subscriptions">
+            <summary>
+            List of subscriptions in the topic
+            </summary>
+        </member>
+    </members>
+</doc>

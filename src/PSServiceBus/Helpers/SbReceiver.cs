@@ -9,9 +9,11 @@ using PSServiceBus.Exceptions;
 
 namespace PSServiceBus.Helpers
 {
+    /// <summary></summary>
     public class SbReceiver
     {
         private readonly MessageReceiver messageReceiver;
+
 
         public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager)
         {

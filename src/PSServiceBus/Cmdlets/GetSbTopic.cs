@@ -7,16 +7,37 @@ using PSServiceBus.Helpers;
 
 namespace PSServiceBus.Cmdlets
 {
+    /// <summary>
+    /// <para type="synopsis">Gets a topic by name or a list of all topics from an Azure Service Bus Namespace.  Returns the names of the subscriptions in the retrieved topic(s).</para>
+    /// <para type="description">Gets a topic by name or a list of all topics from an Azure Service Bus Namespace.  Returns the names of the subscriptions in the retrieved topic(s).</para>
+    /// </summary>
+    /// <example>
+    /// <code>Get-SbTopic -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic'</code>
+    /// <para>This gets information about a single topic called 'example-topic'.</para>
+    /// </example>
+    /// <example>
+    /// <code>Get-SbTopic -NamespaceConnectionString $namespaceConnectionString</code>
+    /// <para>This gets information about all topics.</para>
+    /// </example>
     [Cmdlet(VerbsCommon.Get, "SbTopic")]
     [OutputType(typeof(SbQueue))]
     public class GetSbTopic : Cmdlet
     {
+        /// <summary>
+        /// <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+        /// </summary>
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }
 
+        /// <summary>
+        /// <para type="description">The name of the topic to retrieve.  All topics are returned if not specified.</para>
+        /// </summary>
         [Parameter(Mandatory = false)]
         public string TopicName { get; set; }
 
+        /// <summary>
+        /// Main cmdlet method.
+        /// </summary>
         protected override void ProcessRecord()
         {
             SbManager sbManager = new SbManager(NamespaceConnectionString);

@@ -7,6 +7,7 @@ using PSServiceBus.Enums;
 
 namespace PSServiceBus.Helpers
 {
+    /// <summary></summary>
     public class SbSender
     {
         private readonly MessageSender messageSender;

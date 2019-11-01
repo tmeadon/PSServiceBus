@@ -6,17 +6,37 @@ using PSServiceBus.Helpers;
 
 namespace PSServiceBus.Cmdlets
 {
+    /// <summary>
+    /// <para type="synopsis">Gets a queue by name or a list of all queues from an Azure Service Bus Namespace.  Returns the number of messages in the active and dead letter queues.</para>
+    /// <para type="description">Gets a queue by name or a list of all queues from an Azure Service Bus Namespace.  Returns the number of messages in the active and dead letter queues.</para>
+    /// </summary>
+    /// <example>
+    /// <code>Get-SbQueue -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue'</code>
+    /// <para>This gets information about a single queue called 'example-queue'.</para>
+    /// </example>
+    /// <example>
+    /// <code>Get-SbQueue -NamespaceConnectionString $namespaceConnectionString</code>
+    /// <para>This gets information about all queues.</para>
+    /// </example>
     [Cmdlet(VerbsCommon.Get, "SbQueue")]
     [OutputType(typeof(SbQueue))]
     public class GetSbQueue : Cmdlet
     {
+        /// <summary>
+        /// <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+        /// </summary>
         [Parameter(Mandatory = true)]
         public string NamespaceConnectionString { get; set; }
 
+        /// <summary>
+        /// <para type="description">The name of the queue to retrieve.  All queues are returned if not specified.</para>
+        /// </summary>
         [Parameter(Mandatory = false)]
         public string QueueName { get; set; } = null;
 
-
+        /// <summary>
+        /// Main cmdlet method.
+        /// </summary>
         protected override void ProcessRecord()
         {
             SbManager sbManager = new SbManager(NamespaceConnectionString);

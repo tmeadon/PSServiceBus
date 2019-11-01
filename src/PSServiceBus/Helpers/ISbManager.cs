@@ -4,6 +4,7 @@ using PSServiceBus.Enums;
 
 namespace PSServiceBus.Helpers
 {
+    /// <summary></summary>
     public interface ISbManager
     {
         QueueDescription GetQueueByName(string QueueName);

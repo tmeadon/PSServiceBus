@@ -8,6 +8,7 @@ using PSServiceBus.Enums;
 
 namespace PSServiceBus.Helpers
 {
+    /// <summary></summary>
     public class SbManager: ISbManager
     {
         private readonly ManagementClient managementClient;
