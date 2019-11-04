@@ -25,7 +25,7 @@ Describe "Get-SbTopic tests" {
         $topics += $topic
     }
 
-    Start-Sleep -Seconds 7
+    Start-Sleep -Seconds 10
 
     # tests
 
