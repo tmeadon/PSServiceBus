@@ -1,3 +1,24 @@
+task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, RunIntegrationTests
+task buildModuleOnly LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles
+task buildTestsOnly CleanIntegrationTests, BuildIntegrationTests
+
+task LintPowerShellFunctions {
+    $scriptAnalyzerParams = @{
+        Path = "$BuildRoot\functions\"
+        Severity = @('Error', 'Warning')
+        Recurse = $true
+        Verbose = $false
+    }
+
+    $result = Invoke-ScriptAnalyzer @scriptAnalyzerParams
+
+    if ($result)
+    {
+        $result | Format-Table
+        throw "One or more PSScriptAnalyzer errors/warnings were found."
+    }
+}
+
 task CleanModule {
     if (Test-Path -Path "$BuildRoot\output" -PathType Container)
     {
@@ -17,20 +38,16 @@ task CopyFiles {
     Copy-Item -Path "$BuildRoot\functions" -Destination "$BuildRoot\output\PSServiceBus\functions" -Recurse
 }
 
-task CleanTests {
+task CleanIntegrationTests {
     dotnet.exe clean "$BuildRoot\tests\utils\PSServiceBus.Tests.Utils.sln" -c release
 }
 
-task BuildTests {
+task BuildIntegrationTests {
     dotnet.exe build "$BuildRoot\tests\utils\PSServiceBus.Tests.Utils.sln" -c release
 }
 
-task RunTests {
-    & "$BuildRoot\tests\integration\Start-Tests.ps1" -Verbose
+task RunIntegrationTests {
+    $testResults = & "$BuildRoot\tests\integration\Start-Tests.ps1" -Verbose
+    assert($testResults.FailedCount -eq 0) ("Failed $( $testResults.FailedCount ) integration tests.")
 }
-
-task . CleanModule, BuildModule, CopyFiles, CleanTests, BuildTests, RunTests
-task buildmoduleonly CleanModule, BuildModule, CopyFiles
-task buildtestsonly CleanTests, BuildTests
-task runtestsonly RunTests
 
