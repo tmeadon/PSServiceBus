@@ -24,8 +24,9 @@ steps:
     ScriptType: 'InlineScript'
     Inline: |
       Set-Location -Path $(Build.SourcesDirectory)
+      Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
       Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
-      Install-Module -Name Pester -RequiredVersion 4.9.0
+      Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
       Invoke-Build
     FailOnStandardError: true
     azurePowerShellVersion: 'LatestVersion'
