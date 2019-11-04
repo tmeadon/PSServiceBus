@@ -18,23 +18,14 @@ pool:
 steps:
 
 - task: AzurePowerShell@4
-  displayName: Install dependant modules
-  inputs:
-    azureSubscription: 'Azure'
-    ScriptType: 'InlineScript'
-    Inline: |
-      Install-Module -Name "InvokeBuild" -RequireVersion 5.5.3 -Force
-      Install-Module -Name Pester -RequiredVersion 4.9.0
-    FailOnStandardError: true
-    azurePowerShellVersion: 'LatestVersion'
-
-- task: AzurePowerShell@4
-  displayName: Run InvokeBuild script
+  displayName: Install dependant modules and run InvokeBuild script
   inputs:
     azureSubscription: 'Azure'
     ScriptType: 'InlineScript'
     Inline: |
       Set-Location -Path $(Build.SourcesDirectory)
+      Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
+      Install-Module -Name Pester -RequiredVersion 4.9.0
       Invoke-Build
     FailOnStandardError: true
     azurePowerShellVersion: 'LatestVersion'
