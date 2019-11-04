@@ -1,0 +1,40 @@
+name: $(Major).$(Minor).$(Build)
+
+variables:
+  - group: Secrets
+  - name: Major
+    value: 1
+  - name: Minor
+    value: 0
+  - name: Build
+    value: $[counter('',0)]
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+
+- task: AzurePowerShell@4
+  displayName: Install dependant modules
+  inputs:
+    azureSubscription: 'Azure'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Install-Module -Name "InvokeBuild" -RequireVersion 5.5.3 -Force
+      Install-Module -Name Pester -RequiredVersion 4.9.0
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
+
+- task: AzurePowerShell@4
+  displayName: Run InvokeBuild script
+  inputs:
+    azureSubscription: 'Azure'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Set-Location -Path $(Build.SourcesDirectory)
+      Invoke-Build
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
