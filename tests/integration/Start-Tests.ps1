@@ -21,7 +21,7 @@ Write-Verbose -Message "Created environment $( $testEnvironment | ConvertTo-Json
 
 $sbUtils = [PSServiceBus.Tests.Utils.ServiceBusUtils]::new($testEnvironment.ConnectionString)
 
-Invoke-Pester -Script @{
+$testResults = Invoke-Pester -Strict -PassThru -EnableExit -Script @{
     Path = $PSScriptRoot
     Parameters = @{
         ServiceBusUtils = $sbUtils
@@ -37,3 +37,6 @@ Complete-IntegrationTestRun -ResourceGroupName $testEnvironment.ResourceGroupNam
 $stopwatch.Stop()
 
 Write-Verbose -Message "Integration test run completed in $( $stopwatch.Elapsed.ToString() )"
+
+# return the test results to the pipeline
+Write-Output -InputObject $testResults
