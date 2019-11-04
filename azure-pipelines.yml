@@ -10,7 +10,12 @@ variables:
     value: $[counter('',0)]
 
 trigger:
-- master
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - README.md
 
 pool:
   vmImage: 'windows-latest'
