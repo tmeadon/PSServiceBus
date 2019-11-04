@@ -1,32 +1,32 @@
 task CleanModule {
-    if (Test-Path -Path .\output -PathType Container)
+    if (Test-Path -Path "$BuildRoot\output" -PathType Container)
     {
-        Remove-Item -Path '.\output' -Recurse
+        Remove-Item -Path "$BuildRoot\output" -Recurse
     }
-    dotnet.exe clean .\src\PSServiceBus.sln -c release
+    dotnet.exe clean "$BuildRoot\src\PSServiceBus.sln" -c release
 }
 
 task BuildModule {
-    dotnet.exe build .\src\PSServiceBus.sln -c release
+    dotnet.exe build "$BuildRoot\src\PSServiceBus.sln" -c release
 }
 
 task CopyFiles {
-    New-Item -ItemType Directory -Path '.\output\PSServiceBus'
-    Copy-Item -Path '.\PSServiceBus.ps*' -Destination '.\output\PSServiceBus'
-    Copy-Item -Path '.\src\PSServiceBus\bin\Release\netstandard2.0' -Destination '.\output\PSServiceBus\bin' -Recurse
-    Copy-Item -Path '.\functions' -Destination '.\output\PSServiceBus\functions' -Recurse
+    New-Item -ItemType Directory -Path "$BuildRoot\output\PSServiceBus"
+    Copy-Item -Path "$BuildRoot\PSServiceBus.ps*" -Destination "$BuildRoot\output\PSServiceBus"
+    Copy-Item -Path "$BuildRoot\src\PSServiceBus\bin\Release\netstandard2.0" -Destination "$BuildRoot\output\PSServiceBus\bin" -Recurse
+    Copy-Item -Path "$BuildRoot\functions" -Destination "$BuildRoot\output\PSServiceBus\functions" -Recurse
 }
 
 task CleanTests {
-    dotnet.exe clean .\tests\utils\PSServiceBus.Tests.Utils.sln -c release
+    dotnet.exe clean "$BuildRoot\tests\utils\PSServiceBus.Tests.Utils.sln" -c release
 }
 
 task BuildTests {
-    dotnet.exe build .\tests\utils\PSServiceBus.Tests.Utils.sln -c release
+    dotnet.exe build "$BuildRoot\tests\utils\PSServiceBus.Tests.Utils.sln" -c release
 }
 
 task RunTests {
-    .\tests\integration\Start-Tests.ps1 -Verbose
+    & "$BuildRoot\tests\integration\Start-Tests.ps1" -Verbose
 }
 
 task . CleanModule, BuildModule, CopyFiles, CleanTests, BuildTests, RunTests
