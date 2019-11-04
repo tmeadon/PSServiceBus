@@ -25,7 +25,7 @@ Describe "Get-SbTopic tests" {
         $topics += $topic
     }
 
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 15
 
     # tests
 
@@ -34,7 +34,7 @@ Describe "Get-SbTopic tests" {
         $result = Get-SbTopic -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString
 
         It "should return all of the topics" {
-            $result.count | Should -EQ $topics.count
+            $result.count | Should -Be $topics.count
         }
 
         It "should return the correct number of subscriptions in each topic" {
