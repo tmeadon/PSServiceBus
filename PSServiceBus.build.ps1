@@ -15,17 +15,6 @@ task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegr
 task buildModuleOnly LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles
 task buildTestsOnly CleanIntegrationTests, BuildIntegrationTests
 
-task SetVersionNumber {
-    if ($NewVersionNumber)
-    {
-        $version = $NewVersionNumber
-    }
-    else
-    {
-        $version = (Get-Module "$BuildRoot\PSServiceBus.psd1" -ListAvailable).Version
-    }
-}
-
 task LintPowerShellFunctions {
     $scriptAnalyzerParams = @{
         Path = "$BuildRoot\functions\"
@@ -76,14 +65,9 @@ task RunIntegrationTests {
 }
 
 task UpdateVersion {
-    try 
+    if ($NewVersionNumber)
     {
-        $manifestPath = "$BuildRoot\output\PSServiceBus.psd1"
-        Update-ModuleManifest -Path $manifestPath -ModuleVersion $version
-    }
-    catch
-    {
-        Write-Error -Message $_.Exception.Message
-        $host.SetShouldExit($LastExitCode)
+        # set the version in manifest in the output directory
+        Update-ModuleManifest -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -ModuleVersion $NewVersionNumber
     }
 }
