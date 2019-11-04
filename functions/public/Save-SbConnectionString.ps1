@@ -17,7 +17,7 @@ function Save-SbConnectionString
             $ModuleName = (Get-Item -Path $PSScriptRoot).Parent.Parent.Name
             $Module = Get-Module -Name $ModuleName | Where-Object -FilterScript {$_.ModuleType -eq "Script"}
             $Commands = $Module.ExportedCommands.GetEnumerator()  | Select-Object -ExpandProperty value | Select-Object -ExpandProperty name
-            
+
             foreach ($Command in $Commands)
             {
                 $Global:PSDefaultParameterValues["$Command`:NamespaceConnectionString"] = $NamespaceConnectionString
@@ -25,7 +25,7 @@ function Save-SbConnectionString
         }
         else
         {
-            throw "Testing connection string was unsuccessful."    
+            throw "Testing connection string was unsuccessful."
         }
     }
     catch
