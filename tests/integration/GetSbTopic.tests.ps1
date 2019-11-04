@@ -25,8 +25,6 @@ Describe "Get-SbTopic tests" {
         $topics += $topic
     }
 
-    Start-Sleep -Seconds 15
-
     # tests
 
     Context "Test without -TopicName parameter" {

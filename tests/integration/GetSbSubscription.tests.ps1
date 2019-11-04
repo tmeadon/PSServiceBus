@@ -25,8 +25,6 @@ Describe "Get-SbSubscription tests" {
         $topics += $topic
     }
 
-    Start-Sleep -Seconds 5
-
     # send some messages to each topic and dead letter a portion
     $messagesToSendToEachQueue = 5
     $messagesToDeadLetter = 2

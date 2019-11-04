@@ -22,8 +22,6 @@ Describe "Send-SbMessage tests" {
 
     $testMessage = (New-Guid).Guid
 
-    Start-Sleep -Seconds 10
-
     # send a test message to the test queue and the test topic and allow time to complete
 
     Send-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $testQueue -Message $testMessage

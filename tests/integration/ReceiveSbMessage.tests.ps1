@@ -16,11 +16,7 @@ Describe "Receive-SbMessage tests" {
     $testTopic = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopic)
 
-    Start-Sleep -Seconds 5
-
     $subscriptions = $ServiceBusUtils.CreateSubscriptions($testTopic, 4)
-
-    Start-Sleep -Seconds 5
 
     # send some messages to the queues and the topic and dead letter a portion of them
 
@@ -97,7 +93,7 @@ Describe "Receive-SbMessage tests" {
             $queue = $queues[2]
             $messagesToRemove = 2
             Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve $messagesToRemove -ReceiveType ReceiveAndDelete
-            start-sleep -Seconds 1
+            Start-Sleep -Seconds 1
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter - $messagesToRemove)
         }
 
@@ -135,7 +131,7 @@ Describe "Receive-SbMessage tests" {
             $subscription = $subscriptions[2]
             $messagesToRemove = 2
             Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -NumberOfMessagesToRetrieve $messagesToRemove -ReceiveType ReceiveAndDelete
-            start-sleep -Seconds 1
+            Start-Sleep -Seconds 1
             $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $subscription).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter - $messagesToRemove)
         }
 

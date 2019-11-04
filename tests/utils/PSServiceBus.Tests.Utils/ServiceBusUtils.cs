@@ -22,16 +22,31 @@ namespace PSServiceBus.Tests.Utils
         public void CreateQueue(string QueueName)
         {
             this.managementClient.CreateQueueAsync(QueueName);
+            bool exists = false;
+            while (!exists)
+            {
+                exists = this.managementClient.QueueExistsAsync(QueueName).Result;
+            }
         }
 
         public void CreateTopic(string TopicName)
         {
             this.managementClient.CreateTopicAsync(TopicName);
+            bool exists = false;
+            while (!exists)
+            {
+                exists = this.managementClient.TopicExistsAsync(TopicName).Result;
+            }
         }
 
         public void CreateSubscription(string TopicName, string SubscriptionName)
         {
             this.managementClient.CreateSubscriptionAsync(TopicName, SubscriptionName);
+            bool exists = false;
+            while (!exists)
+            {
+                exists = this.managementClient.SubscriptionExistsAsync(TopicName, SubscriptionName).Result;
+            }
         }
 
         public List<string> CreateQueues(int NumberToCreate)

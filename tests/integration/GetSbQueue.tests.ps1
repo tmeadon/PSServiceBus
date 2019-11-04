@@ -12,8 +12,6 @@ Describe "Get-SbQueue tests" {
     # create some queues and wait for the creation to take place
     $newQueues = $ServiceBusUtils.CreateQueues(4)
 
-    Start-Sleep -Seconds 5
-
     # send some messages to each queue and dead letter a portion
     $messagesToSendToEachQueue = 5
     $messagesToDeadLetter = 2
