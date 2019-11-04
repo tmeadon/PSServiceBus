@@ -1,6 +1,30 @@
-task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, RunIntegrationTests
+param
+(
+    # Version number to stamp module manifest with
+    [Parameter()]
+    [version]
+    $NewVersionNumber,
+
+    # Version number to stamp module manifest with
+    [Parameter()]
+    [string]
+    $PsGalleryKey
+)
+
+task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, RunIntegrationTests, UpdateVersion
 task buildModuleOnly LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles
 task buildTestsOnly CleanIntegrationTests, BuildIntegrationTests
+
+task SetVersionNumber {
+    if ($NewVersionNumber)
+    {
+        $version = $NewVersionNumber
+    }
+    else
+    {
+        $version = (Get-Module "$BuildRoot\PSServiceBus.psd1" -ListAvailable).Version
+    }
+}
 
 task LintPowerShellFunctions {
     $scriptAnalyzerParams = @{
@@ -51,3 +75,15 @@ task RunIntegrationTests {
     assert($testResults.FailedCount -eq 0) ("Failed $( $testResults.FailedCount ) integration tests.")
 }
 
+task UpdateVersion {
+    try 
+    {
+        $manifestPath = "$BuildRoot\output\PSServiceBus.psd1"
+        Update-ModuleManifest -Path $manifestPath -ModuleVersion $version
+    }
+    catch
+    {
+        Write-Error -Message $_.Exception.Message
+        $host.SetShouldExit($LastExitCode)
+    }
+}
