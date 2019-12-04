@@ -96,7 +96,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Azure Service Bus', 'Queues', 'Topics', 'Service Bus')
+        Tags = @('AzureServiceBus', 'Queues', 'Topics', 'ServiceBus')
 
         # A URL to the license for this module.
         # LicenseUri = ''
