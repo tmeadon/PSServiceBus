@@ -14,7 +14,7 @@ function Save-SbConnectionString
         # verify connection string
         if (Test-SbConnectionString -NamespaceConnectionString $NamespaceConnectionString)
         {
-            $ModuleName = (Get-Item -Path $PSScriptRoot).Parent.Parent.Name
+            $ModuleName = 'PSServiceBus'
             $Module = Get-Module -Name $ModuleName | Where-Object -FilterScript {$_.ModuleType -eq "Script"}
             $Commands = $Module.ExportedCommands.GetEnumerator()  | Select-Object -ExpandProperty value | Select-Object -ExpandProperty name
 
