@@ -8,6 +8,12 @@ A PowerShell module for interacting with Azure Service Bus.
 
 This PowerShell modules enables interaction with Azure Service Bus queues, topics and subscriptions.  It can be used to not only report on the current status of the various Service Bus entities, but also to send and receive messages from those entities.
 
+## Installation
+
+The module is hosted on the PowerShell Gallery meaning it can be installed by running:
+
+`Install-Module -Name PSServiceBus`
+
 ## Available Commands
 
 | Command                 | Description                                                                               |
