@@ -59,6 +59,7 @@ namespace PSServiceBus.Helpers
             switch (ReceiveType)
             {
                 case SbReceiveTypes.ReceiveAndKeep:
+                case SbReceiveTypes.PeekOnly:
                     return this.PeekMessages(NumberOfMessages);
 
                 case SbReceiveTypes.ReceiveAndDelete:
@@ -76,7 +77,7 @@ namespace PSServiceBus.Helpers
             for (int i = 0; i < NumberOfMessages; i++)
             {
                 Message message = messageReceiver.PeekBySequenceNumberAsync((messageReceiver.LastPeekedSequenceNumber + 1)).Result;
-
+                
                 if (message != null)
                 {
                     messages.Add(message);

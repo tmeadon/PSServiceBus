@@ -9,7 +9,7 @@ namespace PSServiceBus.Cmdlets
     /// <summary>
     /// <para type="synopsis">Receives a message or messages from an Azure Service Bus queue or subscription.</para>
     /// <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription.  Two receive modes are available:</para>
-    /// <para type="description">ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
+    /// <para type="description">ReceiveAndKeep/PeekOnly (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
     /// <para type="description">received using the -NumberOfMessagesToRetrieve parameter, they will be returned individually to the pipeline.  Messages can also be</para>
     /// <para type="description">received from the dead letter queue by adding the -ReceiveFromDeadLetterQueue parameter.</para>
     /// </summary>

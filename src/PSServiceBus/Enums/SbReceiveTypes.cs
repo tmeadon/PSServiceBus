@@ -13,6 +13,11 @@
         /// <summary>
         /// Leaves the message in the entity after receiving
         /// </summary>
-        ReceiveAndKeep
+        ReceiveAndKeep,
+
+        /// <summary>
+        /// Just like ReceiveAndKeep, it leaves the message in the entity after receiving
+        /// </summary>
+        PeekOnly
     }
 }
