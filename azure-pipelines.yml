@@ -9,9 +9,6 @@ variables:
     value: $[counter('',0)]
 
 trigger:
-  branches:
-    include:
-      - master
   paths:
     exclude:
       - README.md
@@ -22,7 +19,7 @@ pool:
 steps:
 
 - task: AzurePowerShell@4
-  displayName: Install dependant modules and run InvokeBuild script
+  displayName: Install dependant modules and build
   inputs:
     azureSubscription: 'Azure'
     ScriptType: 'InlineScript'
@@ -34,3 +31,17 @@ steps:
       Invoke-Build
     FailOnStandardError: true
     azurePowerShellVersion: 'LatestVersion'
+
+- task: AzurePowerShell@4
+  displayName: Run tests and bump version
+  inputs:
+    azureSubscription: 'Azure'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Set-Location -Path $(Build.SourcesDirectory)
+      Invoke-Build runTestsBumpVersion 
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
+  

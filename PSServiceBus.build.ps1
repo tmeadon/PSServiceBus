@@ -13,6 +13,7 @@ param
 
 task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, UpdateVersion
 task buildAndTest LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, RunIntegrationTests, UpdateVersion
+task runTestsBumpVersion RunIntegrationTests, UpdateVersion
 task buildModuleOnly LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles
 task buildTestsOnly CleanIntegrationTests, BuildIntegrationTests
 
