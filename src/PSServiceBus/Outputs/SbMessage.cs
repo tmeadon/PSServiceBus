@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Azure.ServiceBus;
 
 namespace PSServiceBus.Outputs
 {
@@ -18,5 +20,15 @@ namespace PSServiceBus.Outputs
         /// Message body
         /// </summary>
         public string MessageBody;
+
+        /// <summary>
+        /// System Properties
+        /// </summary>
+        public IDictionary<string, Object> SystemProperties;
+
+        /// <summary>
+        /// User Properties
+        /// </summary>
+        public IDictionary<string,Object> UserProperties;
     }
 }

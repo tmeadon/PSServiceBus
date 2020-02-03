@@ -6,6 +6,7 @@ using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Outputs;
 using PSServiceBus.Enums;
 using PSServiceBus.Exceptions;
+using System.Collections.Specialized;
 
 namespace PSServiceBus.Helpers
 {
@@ -134,11 +135,29 @@ namespace PSServiceBus.Helpers
                 result.Add(new SbMessage
                 {
                     MessageId = message.MessageId,
-                    MessageBody = ConvertMessageBodyToString(message.Body)
+                    MessageBody = ConvertMessageBodyToString(message.Body),
+                    SystemProperties = ConvertSystemPropertiesToIDictonary(message.SystemProperties),
+                    UserProperties = message.UserProperties
                 });
             }
 
             return result;
+        }
+
+        private IDictionary<string, object> ConvertSystemPropertiesToIDictonary(Message.SystemPropertiesCollection systemProperties)
+        {
+            IDictionary<string, object> res = new Dictionary<string, object>();
+            res.Add("DeadLetterSource", systemProperties.DeadLetterSource);
+            res.Add("DeliveryCount", systemProperties.DeliveryCount);
+            res.Add("EnqueuedSequenceNumber", systemProperties.EnqueuedSequenceNumber);
+            res.Add("EnqueuedTimeUtc", systemProperties.EnqueuedTimeUtc);
+            res.Add("IsLockTokenSet", systemProperties.IsLockTokenSet);
+            res.Add("IsReceived", systemProperties.IsReceived);
+            res.Add("LockedUntilUtc", systemProperties.LockedUntilUtc);
+            res.Add("LockToken", systemProperties.LockToken);
+            res.Add("SequenceNumber", systemProperties.SequenceNumber);
+
+            return res;
         }
     }
 }
