@@ -70,7 +70,14 @@ task UpdateVersion {
     if ($NewVersionNumber)
     {
         # checkout the master branch
-        git checkout -b master 2>$null
+        try
+        {
+            git checkout -b master 2>$null
+        }
+        catch
+        {
+            Write-Verbose "Already on master branch"
+        }
 
         # set the version in manifest
         Update-ModuleManifest -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -ModuleVersion $NewVersionNumber
