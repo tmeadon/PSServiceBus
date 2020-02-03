@@ -69,6 +69,9 @@ task RunIntegrationTests {
 task UpdateVersion {
     if ($NewVersionNumber)
     {
+        # checkout the master branch
+        git checkout -b master 2>$null
+
         # set the version in manifest
         Update-ModuleManifest -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -ModuleVersion $NewVersionNumber
 
