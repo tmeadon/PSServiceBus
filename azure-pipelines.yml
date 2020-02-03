@@ -1,6 +1,7 @@
 name: $(Major).$(Minor).$(Build)
 
 variables:
+  - group: secrets
   - name: Major
     value: 1
   - name: Minor
@@ -64,4 +65,4 @@ steps:
       git checkout -b master 2>$null
       git add *
       git commit -m "azure pipeline bump version number"
-      git push --set-upstream origin master
+      git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
