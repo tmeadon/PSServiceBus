@@ -69,25 +69,10 @@ task RunIntegrationTests {
 task UpdateVersion {
     if ($NewVersionNumber)
     {
-        # checkout the master branch
-        try
-        {
-            git checkout -b master 2>$null
-        }
-        catch
-        {
-            Write-Verbose "Already on master branch"
-        }
-
         # set the version in manifest
         Update-ModuleManifest -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -ModuleVersion $NewVersionNumber
 
         # overwrite the source manifest with the updated one
         Copy-Item -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -Destination $BuildRoot -Force
-
-        # push the new version number back to github
-        git add "$BuildRoot\PSServiceBus.psd1"
-        git commit -m "bump version number"
-        git push
     }
 }

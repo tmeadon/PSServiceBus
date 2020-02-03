@@ -44,4 +44,13 @@ steps:
     azurePowerShellVersion: 'LatestVersion'
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
-  
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    workingDirectory: 
+    script: |
+      git config user.email pipeline@azuredevops.com
+      git config user.name 'azure pipeline'
+      git add *
+      git commit -m "azure pipeline bump version number"
+      git push
