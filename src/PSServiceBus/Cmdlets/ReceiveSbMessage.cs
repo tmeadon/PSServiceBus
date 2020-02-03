@@ -95,6 +95,11 @@ namespace PSServiceBus.Cmdlets
             SbReceiver sbReceiver;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
 
+            if (this.ReceiveType == SbReceiveTypes.ReceiveAndKeep)
+            {
+                WriteWarning("The option ReceiveAndKeep will be deprecated in future versions. Please use 'PeekOnly' instead.");
+            }
+
             if (this.ParameterSetName == "ReceiveFromQueue")
             {
                 sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, ReceiveFromDeadLetterQueue, sbManager);
