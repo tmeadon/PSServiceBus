@@ -43,3 +43,5 @@ steps:
     FailOnStandardError: true
     azurePowerShellVersion: 'LatestVersion'
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
+  
