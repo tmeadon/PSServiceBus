@@ -46,10 +46,11 @@ steps:
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
 - task: CmdLine@2
+  displayName: Commit changes back to github
   inputs:
     script: |
-      git config user.email pipeline@azuredevops.com
-      git config user.name 'azure pipeline'
+      git config user.email pipeline@tommagumma.com
+      git config user.name 'AzurePipeline'
       git checkout -b master
       git add *
       git commit -m "[skip ci] azure pipeline bump version number"
