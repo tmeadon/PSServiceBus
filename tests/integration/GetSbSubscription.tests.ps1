@@ -61,6 +61,15 @@ Describe "Get-SbSubscription tests" {
         }
     }
 
+    Context "Output type tests" {
+
+        It "should have an output type of PSServiceBus.Outputs.SbSubscription" {
+            (Get-Command -Name "Get-SbSubscription").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbSubscription" 
+        }
+    
+    }
+
+
     Context "Test without -SubscriptionName parameter" {
 
         $testTopic = $topics[0]
