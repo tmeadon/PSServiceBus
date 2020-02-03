@@ -50,7 +50,7 @@ Now you are good to go!
 - `src/` - this is where the C# solution lives that contains the binary cmdlets
 - `tests/integration/` - files containing Pester integration tests and a script to run them
 - `tests/utils/` - some helpers for the integration tests including some PowerShell functions and another C# solution
-- `functions/public` - additional PowerShell functions that will be available to the user
+- `functions/public/` - additional PowerShell functions that will be available to the user
 
 ## Build
 
@@ -78,17 +78,27 @@ To execute the build script you need the following (note this doesn't include th
 
 ## Tests
 
-In its current state the code in this module is essentially just a wrapper around some of the Microsoft.Azure.ServiceBus classes, as such there is no requiremnent for unit tests because they would be primarily testing someone else's code.  Instead integration tests have been written to ensure that the module interacts with Azure Service Bus as expected.  To run the full suite of integration tests simply run:
+In its current state the code in this module is essentially just a wrapper around some of the Microsoft.Azure.ServiceBus classes, as such there is no requirement for unit tests because they would be primarily testing someone else's code.  Instead, integration tests have been written to ensure that the module interacts with Azure Service Bus as expected.  
 
-`tests\integration\Start-Tests.ps1`
+Due to the issue described in [#7](https://github.com/tommagumma/PSServiceBus/issues/7), the process to run the integration tests is more complicated than it needs to be.  Firstly build the solutions by running the default build task:
 
-The script will first provision a temporary environment in Azure (see requirements below) and will then execute all of the tests.  After it is done the environment will be destroyed.
+`Invoke-Build`
+
+Open a brand new PowerShell process and then kick off the integration tests by running:
+
+`Invoke-Build RunIntegrationTests`
+
+This build task calls the script `tests\integration\Start-Tests.ps1` which will first provision a temporary environment in Azure (see requirements below) and will then execute all of the tests found in the same directory.  After it is done the environment will be destroyed.
+
+All integration tests have been written using [Pester](https://github.com/pester/Pester) version 4.9.  Each cmdlet/function in PSServiceBus has its own `.tests.ps1` file in `tests\integration\` containing the tests for that cmdlet/function.  The test files generally start with a bit of setup before executing the tests; for example, the tests for `Get-SbQueue` (stored in `tests\integration\GetSbQueue.tests.ps1`) start by creating some queues and populating them with some messages making them ready to be subsequently used to test the `Get-SbQueue` cmdlet.
+
+There is a C# library solution called `PSServiceBus.Tests.Utils` stored in `tests\utils\PSServiceBus.Tests.Utils` which is used to assist with test setup and execution by exposing methods for common action (such as creating queues or sending messages).  Whilst a lot of the functionality of this solution is covered by the PSServiceBus module it was felt that it would be bad practice for it to be used to run its own tests.  
 
 ### Tests Requirements
 
 In order to run the tests you will need the following:
 
-- An Azure subscription and an account with the privileges to:
+- An Azure subscription and an account with the privileges to:  
   - Create and delete resource groups
   - Create and delete Service Bus resources
 - PowerShell modules:
