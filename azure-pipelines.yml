@@ -9,9 +9,6 @@ variables:
     value: $[counter('',0)]
 
 trigger:
-  branches:
-    include:
-      - master
   paths:
     exclude:
       - README.md
