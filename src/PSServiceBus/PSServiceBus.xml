@@ -100,7 +100,7 @@
             <summary>
             <para type="synopsis">Receives a message or messages from an Azure Service Bus queue or subscription.</para>
             <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription.  Two receive modes are available:</para>
-            <para type="description">ReceiveAndKeep/PeekOnly (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
+            <para type="description">PeekOnly/ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
             <para type="description">received using the -NumberOfMessagesToRetrieve parameter, they will be returned individually to the pipeline.  Messages can also be</para>
             <para type="description">received from the dead letter queue by adding the -ReceiveFromDeadLetterQueue parameter.</para>
             </summary>
@@ -152,7 +152,7 @@
         </member>
         <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.ReceiveType">
             <summary>
-            <para type="description">Specifies the receive behaviour - defaults to ReceiveAndKeep.</para>
+            <para type="description">Specifies the receive behaviour - defaults to PeekOnly.</para>
             </summary>
         </member>
         <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.ReceiveFromDeadLetterQueue">
@@ -256,12 +256,12 @@
         </member>
         <member name="F:PSServiceBus.Enums.SbReceiveTypes.ReceiveAndKeep">
             <summary>
-            Leaves the message in the entity after receiving
+            Just like PeekOnly, it leaves the message in the entity after receiving
             </summary>
         </member>
         <member name="F:PSServiceBus.Enums.SbReceiveTypes.PeekOnly">
             <summary>
-            Just like ReceiveAndKeep, it leaves the message in the entity after receiving
+            Uses the Peek feature and leaves the message in the entity after receiving
             </summary>
         </member>
         <member name="T:PSServiceBus.Exceptions.NonExistentEntityException">
