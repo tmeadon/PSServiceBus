@@ -58,6 +58,7 @@ There is an [Invoke Build](https://github.com/nightroman/Invoke-Build) script at
 
 * `Invoke-Build` - this will lint the PowerShell functions, clean and build the binary cmdlets, clean and build the integration test helper binaries
 * `Invoke-Build buildAndTest` - this will do all of the above but will also execute the integration tests
+* `Invoke-Build runTestsBumpVersion` - this will only run the integration tests and bump the version number
 * `Invoke-Build buildModuleOnly` - this will do the linting and building of the module only
 * `Invoke-Build buildTestsOnly` - this will build the integration test helper binaries only
 
