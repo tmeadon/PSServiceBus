@@ -50,7 +50,7 @@ steps:
     script: |
       git config user.email pipeline@azuredevops.com
       git config user.name 'azure pipeline'
-      git checkout -b master 2>$null
+      git checkout -b master
       git add *
       git commit -m "azure pipeline bump version number"
       git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
