@@ -2,7 +2,7 @@
 
 A PowerShell module for interacting with Azure Service Bus.
 
-[![Build Status](https://dev.azure.com/tommagumma1/PSServiceBus/_apis/build/status/tommagumma.PSServiceBus?branchName=master)](https://dev.azure.com/tommagumma/PSServiceBus/_build/latest?definitionId=1&branchName=master)
+[![Build Status](https://dev.azure.com/tommagumma1/PSServiceBus/_apis/build/status/tommagumma.PSServiceBus?branchName=master)](https://dev.azure.com/tommagumma1/PSServiceBus/_build/latest?definitionId=1&branchName=master)
 
 ## Overview 
 
