@@ -19,43 +19,31 @@ pool:
 
 steps:
 
-# - task: AzurePowerShell@4
-#   displayName: Install dependant modules and build
-#   inputs:
-#     azureSubscription: 'Azure'
-#     ScriptType: 'InlineScript'
-#     Inline: |
-#       Set-Location -Path $(Build.SourcesDirectory)
-#       Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
-#       Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
-#       Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
-#       Invoke-Build
-#     FailOnStandardError: true
-#     azurePowerShellVersion: 'LatestVersion'
+- task: AzurePowerShell@4
+  displayName: Install dependant modules and build
+  inputs:
+    azureSubscription: 'Azure'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Set-Location -Path $(Build.SourcesDirectory)
+      Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
+      Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
+      Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
+      Invoke-Build
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
 
-# - task: AzurePowerShell@4
-#   displayName: Run tests and bump version
-#   inputs:
-#     azureSubscription: 'Azure'
-#     ScriptType: 'InlineScript'
-#     Inline: |
-#       Set-Location -Path $(Build.SourcesDirectory)
-#       Invoke-Build runTestsBumpVersion -NewVersionNumber $(Build.BuildNumber)
-#     FailOnStandardError: true
-#     azurePowerShellVersion: 'LatestVersion'
-#   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-
-# - task: PowerShell@2
-#   inputs:
-#     targetType: 'inline'
-#     workingDirectory: 
-#     script: |
-#       git config user.email pipeline@azuredevops.com
-#       git config user.name 'azure pipeline'
-#       git checkout -b master 2>$null
-#       git add *
-#       git commit -m "azure pipeline bump version number"
-#       git push
+- task: AzurePowerShell@4
+  displayName: Run tests and bump version
+  inputs:
+    azureSubscription: 'Azure'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Set-Location -Path $(Build.SourcesDirectory)
+      Invoke-Build runTestsBumpVersion -NewVersionNumber $(Build.BuildNumber)
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
 - task: CmdLine@2
   inputs:
