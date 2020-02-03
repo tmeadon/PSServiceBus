@@ -12,7 +12,7 @@
 RootModule = 'PSServiceBus.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.21'
+ModuleVersion = '1.0.23'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
