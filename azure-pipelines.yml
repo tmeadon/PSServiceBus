@@ -1,7 +1,6 @@
 name: $(Major).$(Minor).$(Build)
 
 variables:
-  - group: Secrets
   - name: Major
     value: 1
   - name: Minor
