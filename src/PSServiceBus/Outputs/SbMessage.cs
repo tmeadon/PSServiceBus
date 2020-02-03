@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.ServiceBus;
 
 namespace PSServiceBus.Outputs
 {

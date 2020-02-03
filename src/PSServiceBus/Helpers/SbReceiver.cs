@@ -6,7 +6,6 @@ using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Outputs;
 using PSServiceBus.Enums;
 using PSServiceBus.Exceptions;
-using System.Collections.Specialized;
 
 namespace PSServiceBus.Helpers
 {
