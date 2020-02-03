@@ -39,7 +39,7 @@ steps:
     ScriptType: 'InlineScript'
     Inline: |
       Set-Location -Path $(Build.SourcesDirectory)
-      Invoke-Build runTestsBumpVersion 
+      Invoke-Build runTestsBumpVersion -NewVersionNumber $(Build.BuildNumber)
     FailOnStandardError: true
     azurePowerShellVersion: 'LatestVersion'
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
