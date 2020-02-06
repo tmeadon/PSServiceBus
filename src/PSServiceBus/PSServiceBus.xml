@@ -302,6 +302,16 @@
             Message body
             </summary>
         </member>
+        <member name="F:PSServiceBus.Outputs.SbMessage.SystemProperties">
+            <summary>
+            System Properties
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessage.UserProperties">
+            <summary>
+            User Properties
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Outputs.SbQueue">
             <summary>
             <para type="description">Contains the name of a queue and the number of messages in the 'active' and 'dead letter' queues.</para>
