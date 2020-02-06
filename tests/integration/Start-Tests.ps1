@@ -1,5 +1,11 @@
 [CmdletBinding()]
-Param ()
+Param (
+    # Azure region to use for tests
+    [string] $Location = "UK South",
+
+    #SubcriptionId where you want the test to run against
+    [string] $SubscriptionId
+)
 
 # start a stopwatch to time test run
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
@@ -15,11 +21,8 @@ Import-Module $PSScriptRoot\..\utils\PSServiceBus.Tests.Utils\bin\Release\netsta
 # prepare for test run
 Write-Verbose -Message 'Preparing test run'
 
-# Don't care about what subscription you will be working against?
-$testEnvironment = Initialize-IntegrationTestRun -Location 'uk south'
-
-# Have dedicated subscription you want to use?
-#$testEnvironment = Initialize-IntegrationTestRun -Location 'uk south' -SubscriptionId "7c569866-2b86-43ac-ad3c-1b132add158d"
+# Prepare the test objects.
+$testEnvironment = Initialize-IntegrationTestRun -Location $Location -SubscriptionId $SubscriptionId
 
 Write-Verbose -Message "Created environment $( $testEnvironment | ConvertTo-Json -Compress )"
 
