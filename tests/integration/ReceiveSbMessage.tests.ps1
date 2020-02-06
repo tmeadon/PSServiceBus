@@ -76,6 +76,18 @@ Describe "Receive-SbMessage tests" {
             $result.count | Should -Be 1
         }
 
+        It "should contain SystemProperties property on the SbMessage object" {
+            $queue = $queues[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            $null -eq $result.SystemProperties | Should -be $false
+        }
+
+        It "should contain UserProperties property on the SbMessage object" {
+            $queue = $queues[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            $null -eq $result.UserProperties | Should -be $false
+        }
+
         It "should receive the correct number of messages if -NumberOfMessagesToRetrieve is supplied" -TestCases @{messages = 2}, @{messages = 3} {
             param ([int] $messages)
             $queue = $queues[1]
