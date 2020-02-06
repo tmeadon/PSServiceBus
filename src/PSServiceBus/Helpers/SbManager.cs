@@ -87,6 +87,13 @@ namespace PSServiceBus.Helpers
             return managementClient.GetSubscriptionRuntimeInfoAsync(TopicName, SubscriptionName).Result;
         }
 
+        public TopicRuntimeInfo GetTopicRuntimeInfo(string TopicName)
+        {
+            this.GetTopicByName(TopicName);
+
+            return managementClient.GetTopicRuntimeInfoAsync(TopicName).Result;
+        }
+
         public bool QueueOrTopicExists(string entityPath, SbEntityTypes entityType)
         {
             switch (entityType)
