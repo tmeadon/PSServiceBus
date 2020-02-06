@@ -53,6 +53,14 @@ Describe "Receive-SbMessage tests" {
 
     # tests
 
+    Context "Output type tests" {
+
+        It "should have an output type of PSServiceBus.Outputs.SbMessage" {
+            (Get-Command -Name "Receive-SbMessage").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbMessage" 
+        }
+        
+    }
+
     Context "Test parameter attributes" {
 
         It "QueueName parameter should be mandatory" {

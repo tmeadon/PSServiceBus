@@ -27,6 +27,14 @@ Describe "Get-SbTopic tests" {
 
     # tests
 
+    Context "Output type tests" {
+
+        It "should have an output type of PSServiceBus.Outputs.SbTopic" {
+            (Get-Command -Name "Get-SbTopic").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbTopic" 
+        }
+        
+    }
+
     Context "Test without -TopicName parameter" {
 
         $result = Get-SbTopic -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString

@@ -13,6 +13,7 @@ param
 
 task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, UpdateVersion
 task buildAndTest LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, RunIntegrationTests, UpdateVersion
+task runTestsBumpVersion RunIntegrationTests, UpdateVersion
 task buildModuleOnly LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles
 task buildTestsOnly CleanIntegrationTests, BuildIntegrationTests
 
@@ -68,7 +69,10 @@ task RunIntegrationTests {
 task UpdateVersion {
     if ($NewVersionNumber)
     {
-        # set the version in manifest in the output directory
+        # set the version in manifest
         Update-ModuleManifest -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -ModuleVersion $NewVersionNumber
+
+        # overwrite the source manifest with the updated one
+        Copy-Item -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -Destination $BuildRoot -Force
     }
 }
