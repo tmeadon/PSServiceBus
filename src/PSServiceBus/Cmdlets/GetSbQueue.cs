@@ -71,7 +71,8 @@ namespace PSServiceBus.Cmdlets
                 {
                     Name = queue.Path,
                     ActiveMessages = queueRuntimeInfo.MessageCountDetails.ActiveMessageCount,
-                    DeadLetteredMessages = queueRuntimeInfo.MessageCountDetails.DeadLetterMessageCount
+                    DeadLetteredMessages = queueRuntimeInfo.MessageCountDetails.DeadLetterMessageCount,
+                    ScheduledMessageCount = queueRuntimeInfo.MessageCountDetails.ScheduledMessageCount
                 });
             }
 
