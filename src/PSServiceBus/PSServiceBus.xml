@@ -367,5 +367,10 @@
             List of subscriptions in the topic
             </summary>
         </member>
+        <member name="P:PSServiceBus.Outputs.SbTopic.ScheduledMessages">
+            <summary>
+            Number of messages in the scheduled queue
+            </summary>
+        </member>
     </members>
 </doc>
