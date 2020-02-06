@@ -55,4 +55,4 @@ steps:
       git add *
       git commit -m "[skip ci] azure pipeline bump version number"
       git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
-      
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')    
