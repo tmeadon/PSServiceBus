@@ -159,6 +159,11 @@ namespace PSServiceBus.Tests.Utils
             return this.managementClient.GetSubscriptionRuntimeInfoAsync(topicName, subscriptionName).Result;
         }
 
+        public TopicRuntimeInfo GetTopicRuntimeInfo(string topicName)
+        {
+            return this.managementClient.GetTopicRuntimeInfoAsync(topicName).Result;
+        }
+
         public void SendMessage(string entityName, string messageBody)
         {
             MessageSender messageSender = new MessageSender(this.NamespaceConnectionString, entityName);
