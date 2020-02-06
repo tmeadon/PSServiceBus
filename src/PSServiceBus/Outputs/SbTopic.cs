@@ -16,5 +16,10 @@ namespace PSServiceBus.Outputs
         /// List of subscriptions in the topic
         /// </summary>
         public List<string> Subscriptions { get; set; }
+
+        /// <summary>
+        /// Number of messages in the scheduled queue
+        /// </summary>
+        public long ScheduledMessages { get; set; }
     }
 }
