@@ -1,7 +1,7 @@
 name: $(Major).$(Minor).$(Build)
 
 variables:
-  - group: Secrets
+  - group: secrets
   - name: Major
     value: 1
   - name: Minor
@@ -10,9 +10,6 @@ variables:
     value: $[counter('',0)]
 
 trigger:
-  branches:
-    include:
-      - master
   paths:
     exclude:
       - README.md
@@ -23,7 +20,7 @@ pool:
 steps:
 
 - task: AzurePowerShell@4
-  displayName: Install dependant modules and run InvokeBuild script
+  displayName: Install dependant modules and build
   inputs:
     azureSubscription: 'Azure'
     ScriptType: 'InlineScript'
@@ -35,3 +32,27 @@ steps:
       Invoke-Build
     FailOnStandardError: true
     azurePowerShellVersion: 'LatestVersion'
+
+- task: AzurePowerShell@4
+  displayName: Run tests and bump version
+  inputs:
+    azureSubscription: 'Azure'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Set-Location -Path $(Build.SourcesDirectory)
+      Invoke-Build runTestsBumpVersion -NewVersionNumber $(Build.BuildNumber)
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
+- task: CmdLine@2
+  displayName: Commit changes back to github
+  inputs:
+    script: |
+      git config user.email pipeline@tommagumma.com
+      git config user.name 'AzurePipeline'
+      git checkout -b master
+      git add *
+      git commit -m "[skip ci] azure pipeline bump version number"
+      git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
+      
