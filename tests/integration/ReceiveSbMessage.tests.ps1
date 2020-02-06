@@ -95,6 +95,12 @@ Describe "Receive-SbMessage tests" {
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
         }
 
+        It "should write warning message notifying the user that they should use PeekOnly instead of ReceiveAndKeep" {
+            $queue = $queues[4]
+            $temp = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve 2 -ReceiveType ReceiveAndKeep 3>&1 
+            $temp[0].Message | Should -Be "The option ReceiveAndKeep will be deprecated in future versions. Please use 'PeekOnly' instead."
+        }
+
         It "should leave messages in the queue after being received if -ReceiveType is ReceiveAndKeep" {
             $queue = $queues[4]
             Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve 2 -ReceiveType ReceiveAndKeep
