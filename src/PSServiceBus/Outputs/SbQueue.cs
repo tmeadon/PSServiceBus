@@ -19,5 +19,10 @@
         /// Number of messages in the dead letter queue
         /// </summary>
         public long DeadLetteredMessages { get; set; }
+
+        /// <summary>
+        /// Number of messages in the scheduled queue
+        /// </summary>
+        public long ScheduledMessageCount { get; set; }
     }
 }

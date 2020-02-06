@@ -332,6 +332,11 @@
             Number of messages in the dead letter queue
             </summary>
         </member>
+        <member name="P:PSServiceBus.Outputs.SbQueue.ScheduledMessageCount">
+            <summary>
+            Number of messages in the scheduled queue
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Outputs.SbSubscription">
             <summary>
             <para type="description">Contains the name of a subscription, the name of the containing topic, and the number of messages in the 'active' and 'dead letter' queues.</para>
@@ -370,6 +375,11 @@
         <member name="P:PSServiceBus.Outputs.SbTopic.Subscriptions">
             <summary>
             List of subscriptions in the topic
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Outputs.SbTopic.ScheduledMessages">
+            <summary>
+            Number of messages in the scheduled queue
             </summary>
         </member>
     </members>
