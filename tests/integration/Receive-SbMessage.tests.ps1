@@ -53,6 +53,14 @@ Describe "Receive-SbMessage tests" {
 
     # tests
 
+    Context "Output type tests" {
+
+        It "should have an output type of PSServiceBus.Outputs.SbMessage" {
+            (Get-Command -Name "Receive-SbMessage").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbMessage" 
+        }
+        
+    }
+
     Context "Test parameter attributes" {
 
         It "QueueName parameter should be mandatory" {
@@ -74,6 +82,18 @@ Describe "Receive-SbMessage tests" {
             $queue = $queues[0]
             $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
             $result.count | Should -Be 1
+        }
+
+        It "should contain SystemProperties property on the SbMessage object" {
+            $queue = $queues[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            $null -eq $result.SystemProperties | Should -be $false
+        }
+
+        It "should contain UserProperties property on the SbMessage object" {
+            $queue = $queues[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            $null -eq $result.UserProperties | Should -be $false
         }
 
         It "should receive the correct number of messages if -NumberOfMessagesToRetrieve is supplied" -TestCases @{messages = 2}, @{messages = 3} {

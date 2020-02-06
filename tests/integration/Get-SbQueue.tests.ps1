@@ -31,6 +31,14 @@ Describe "Get-SbQueue tests" {
 
     # tests
 
+    Context "Output type tests" {
+
+        It "should have an output type of PSServiceBus.Outputs.SbQueue" {
+            (Get-Command -Name "Get-SbQueue").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbQueue" 
+        }
+        
+    }
+
     Context "Test without -QueueName parameter" {
 
         $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString

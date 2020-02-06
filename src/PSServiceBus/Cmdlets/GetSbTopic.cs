@@ -20,7 +20,7 @@ namespace PSServiceBus.Cmdlets
     /// <para>This gets information about all topics.</para>
     /// </example>
     [Cmdlet(VerbsCommon.Get, "SbTopic")]
-    [OutputType(typeof(SbQueue))]
+    [OutputType(typeof(SbTopic))]
     public class GetSbTopic : Cmdlet
     {
         /// <summary>

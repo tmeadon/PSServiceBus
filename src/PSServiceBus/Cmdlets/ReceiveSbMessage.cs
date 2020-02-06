@@ -34,6 +34,7 @@ namespace PSServiceBus.Cmdlets
     /// <para></para>
     /// </example>
     [Cmdlet(VerbsCommunications.Receive, "SbMessage")]
+    [OutputType(typeof(SbMessage))]
     public class ReceiveSbMessage : PSCmdlet
     {
         /// <summary>
