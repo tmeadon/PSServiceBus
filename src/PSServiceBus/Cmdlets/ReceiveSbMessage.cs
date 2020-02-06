@@ -9,7 +9,7 @@ namespace PSServiceBus.Cmdlets
     /// <summary>
     /// <para type="synopsis">Receives a message or messages from an Azure Service Bus queue or subscription.</para>
     /// <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription.  Two receive modes are available:</para>
-    /// <para type="description">ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
+    /// <para type="description">PeekOnly/ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
     /// <para type="description">received using the -NumberOfMessagesToRetrieve parameter, they will be returned individually to the pipeline.  Messages can also be</para>
     /// <para type="description">received from the dead letter queue by adding the -ReceiveFromDeadLetterQueue parameter.</para>
     /// </summary>
@@ -77,10 +77,10 @@ namespace PSServiceBus.Cmdlets
         public int NumberOfMessagesToRetrieve { get; set; } = 1;
 
         /// <summary>
-        /// <para type="description">Specifies the receive behaviour - defaults to ReceiveAndKeep.</para>
+        /// <para type="description">Specifies the receive behaviour - defaults to PeekOnly.</para>
         /// </summary>
         [Parameter]
-        public SbReceiveTypes ReceiveType { get; set; } = SbReceiveTypes.ReceiveAndKeep;
+        public SbReceiveTypes ReceiveType { get; set; } = SbReceiveTypes.PeekOnly;
 
         /// <summary>
         /// <para type="description">Retrieves messages from the entity's dead letter queue.</para>
@@ -95,6 +95,11 @@ namespace PSServiceBus.Cmdlets
         {
             SbReceiver sbReceiver;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
+
+            if (this.ReceiveType == SbReceiveTypes.ReceiveAndKeep)
+            {
+                WriteWarning("The option ReceiveAndKeep will be deprecated in future versions. Please use 'PeekOnly' instead.");
+            }
 
             if (this.ParameterSetName == "ReceiveFromQueue")
             {
