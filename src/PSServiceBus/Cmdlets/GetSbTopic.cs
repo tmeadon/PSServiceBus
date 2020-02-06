@@ -67,12 +67,14 @@ namespace PSServiceBus.Cmdlets
             foreach (var topic in topics)
             {
                 IList<SubscriptionDescription> subscriptions = SbManager.GetAllSubscriptions(topic.Path);
+                TopicRuntimeInfo topicRuntimeInfo = SbManager.GetTopicRuntimeInfo(topic.Path);
 
                 result.Add(new SbTopic
                 {
                     TopicName = topic.Path,
-                    Subscriptions = subscriptions.Select(sub => sub.SubscriptionName).ToList()
-                });
+                    Subscriptions = subscriptions.Select(sub => sub.SubscriptionName).ToList(),
+                    ScheduledMessages = topicRuntimeInfo.MessageCountDetails.ScheduledMessageCount
+                }) ;
             }
 
             return result;
