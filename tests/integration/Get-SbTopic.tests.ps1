@@ -25,12 +25,25 @@ Describe "Get-SbTopic tests" {
         $topics += $topic
     }
 
+    $messagesToScheduleToEachEntity = 4
+    $enqueueMinutesIntoFuture = 10
+
+    $enqueueDatetime = (Get-Date).AddMinutes($enqueueMinutesIntoFuture).ToUniversalTime()
+
+    foreach ($topic in $topics)
+    {
+        for ($i = 0; $i -lt $messagesToScheduleToEachEntity; $i++)
+        {
+            $ServiceBusUtils.ScheduleTestMessage($topic.Topic, $enqueueDatetime)
+        }
+    }
+
     # tests
 
     Context "Output type tests" {
 
         It "should have an output type of PSServiceBus.Outputs.SbTopic" {
-            (Get-Command -Name "Get-SbTopic").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbTopic" 
+            (Get-Command -Name "Get-SbTopic").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbTopic"
         }
         
     }
@@ -50,13 +63,20 @@ Describe "Get-SbTopic tests" {
             }
         }
 
+        It "should return the correct number of scheduled messages in each topic" {
+            foreach ($item in $result)
+            {
+                $item.ScheduledMessages | Should -Be $messagesToScheduleToEachEntity
+            }
+        }
+
         It "should return the correct subscriptions in each topic" {
             foreach ($item in $result)
             {
                 for ($i = 0; $i -lt $subscriptionsToCreatePerTopic; $i++)
                 {
                     $item.Subscriptions[$i] | Should -BeIn $topics.Where({$_.Topic -eq $item.TopicName}).Subscriptions
-                } 
+                }
             }
         }
     }
@@ -81,7 +101,13 @@ Describe "Get-SbTopic tests" {
         It "should return the correct number of subscriptions in a topic" -TestCases $testCases {
             param ([PSCustomObject] $topic)
             $result = Get-SbTopic -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $topic.Topic
-            $result.Subscriptions.count | Should -Be $topic.Subscriptions.count   
+            $result.Subscriptions.count | Should -Be $topic.Subscriptions.count
+        }
+
+        It "should return the correct number of scheduled messages in a topic" -TestCases $testCases {
+            param ([PSCustomObject] $topic)
+            $result = Get-SbTopic -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $topic.Topic
+            $result.ScheduledMessages | Should -Be $messagesToScheduleToEachEntity
         }
 
         It "should return the correct subscriptions in a topic" -TestCases $testCases {
