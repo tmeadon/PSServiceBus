@@ -15,7 +15,11 @@ Import-Module $PSScriptRoot\..\utils\PSServiceBus.Tests.Utils\bin\Release\netsta
 # prepare for test run
 Write-Verbose -Message 'Preparing test run'
 
+# Don't care about what subscription you will be working against?
 $testEnvironment = Initialize-IntegrationTestRun -Location 'uk south'
+
+# Have dedicated subscription you want to use?
+#$testEnvironment = Initialize-IntegrationTestRun -Location 'uk south' -SubscriptionId "7c569866-2b86-43ac-ad3c-1b132add158d"
 
 Write-Verbose -Message "Created environment $( $testEnvironment | ConvertTo-Json -Compress )"
 
