@@ -11,7 +11,8 @@ function Initialize-IntegrationTestRun
         [string]
         $Location,
         
-        [string] $SubscriptionId
+        [string]
+        $SubscriptionId
     )
 
     # test that az module is logged in
@@ -20,7 +21,7 @@ function Initialize-IntegrationTestRun
     # test if you are trying to hit another subscription than the default one
     if (-not [System.String]::IsNullOrEmpty($SubscriptionId))
     {
-        Set-AzContext -Subscription $SubscriptionId
+        Set-AzContext -Subscription $SubscriptionId -Scope Process
     }
 
     # store current subscription
