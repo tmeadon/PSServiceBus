@@ -13,12 +13,12 @@ param
     #SubcriptionId where you want the test to run against
     [Parameter()]
     [string]
-    $Location = "UK South",
+    $TestLocation = "UK South",
     
     #SubcriptionId where you want the test to run against
     [Parameter()]
     [string]
-    $SubscriptionId
+    $TestSubscriptionId
 )
 
 task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, UpdateVersion
@@ -72,7 +72,7 @@ task BuildIntegrationTests {
 }
 
 task RunIntegrationTests {
-    $testResults = & "$BuildRoot\tests\integration\Start-Tests.ps1" -SubscriptionId $SubscriptionId -Location $Location -Verbose
+    $testResults = & "$BuildRoot\tests\integration\Start-Tests.ps1" -SubscriptionId $TestSubscriptionId -Location $TestLocation -Verbose
     assert($testResults.FailedCount -eq 0) ("Failed $( $testResults.FailedCount ) integration tests.")
 }
 
