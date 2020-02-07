@@ -9,11 +9,20 @@ function Initialize-IntegrationTestRun
         # Azure region to use for tests
         [Parameter(Mandatory)]
         [string]
-        $Location
+        $Location,
+        
+        [string]
+        $SubscriptionId
     )
 
     # test that az module is logged in
     Get-AzSubscription -ErrorAction Stop | Out-Null
+
+    # test if you are trying to hit another subscription than the default one
+    if (-not [System.String]::IsNullOrEmpty($SubscriptionId))
+    {
+        Set-AzContext -Subscription $SubscriptionId -Scope Process
+    }
 
     # store current subscription
     $subscription = (Get-AzContext).Subscription.Name
@@ -60,7 +69,7 @@ function Initialize-IntegrationTestRun
 
 function Complete-IntegrationTestRun
 {
-    #Requires -Module Az.Resources 
+    #Requires -Module Az.Resources
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     Param
