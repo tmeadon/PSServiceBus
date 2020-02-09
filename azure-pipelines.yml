@@ -23,7 +23,6 @@ pr:
     include:
     - master
 
-
 stages:
 
   - stage: build
