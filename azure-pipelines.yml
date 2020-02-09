@@ -14,45 +14,74 @@ trigger:
     exclude:
       - README.md
 
-pool:
-  vmImage: 'windows-latest'
+stages:
 
-steps:
+  - stage: build
+    pool:
+      vmImage: 'windows-latest'
+    jobs:
+    - job: build
+      steps:
+      - task: AzurePowerShell@4
+        displayName: Install dependant modules and build
+        inputs:
+          azureSubscription: 'Azure'
+          ScriptType: 'InlineScript'
+          Inline: |
+            Set-Location -Path $(Build.SourcesDirectory)
+            Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
+            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
+            Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
+            Invoke-Build
+          FailOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
 
-- task: AzurePowerShell@4
-  displayName: Install dependant modules and build
-  inputs:
-    azureSubscription: 'Azure'
-    ScriptType: 'InlineScript'
-    Inline: |
-      Set-Location -Path $(Build.SourcesDirectory)
-      Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
-      Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
-      Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
-      Invoke-Build
-    FailOnStandardError: true
-    azurePowerShellVersion: 'LatestVersion'
+  - stage: test 
+    pool:
+      vmImage: 'windows-latest'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    jobs:
+    - job: test_windows
+      steps:
+      - task: AzurePowerShell@4
+        displayName: Run tests and bump version
+        inputs:
+          azureSubscription: 'Azure'
+          ScriptType: 'InlineScript'
+          Inline: |
+            Set-Location -Path $(Build.SourcesDirectory)
+            Invoke-Build RunIntegrationTests -NewVersionNumber $(Build.BuildNumber)
+          FailOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
 
-- task: AzurePowerShell@4
-  displayName: Run tests and bump version
-  inputs:
-    azureSubscription: 'Azure'
-    ScriptType: 'InlineScript'
-    Inline: |
-      Set-Location -Path $(Build.SourcesDirectory)
-      Invoke-Build runTestsBumpVersion -NewVersionNumber $(Build.BuildNumber)
-    FailOnStandardError: true
-    azurePowerShellVersion: 'LatestVersion'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-
-- task: CmdLine@2
-  displayName: Commit changes back to github
-  inputs:
-    script: |
-      git config user.email pipeline@tommagumma.com
-      git config user.name 'AzurePipeline'
-      git checkout -b master
-      git add *
-      git commit -m "[skip ci] azure pipeline bump version number"
-      git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')    
+  - stage: publish
+    pool:
+      vmImage: 'windows-latest'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    jobs:
+    - job: publish
+      steps:
+      - task: AzurePowerShell@4
+        displayName: Bump version number
+        inputs:
+          azureSubscription: 'Azure'
+          ScriptType: 'InlineScript'
+          Inline: |
+            Invoke-Build UpdateVersion
+      - task: CmdLine@2
+        displayName: Commit changes back to github
+        inputs:
+          script: |
+            git config user.email pipeline@tommagumma.com
+            git config user.name 'AzurePipeline'
+            git checkout -b master
+            git add *
+            git commit -m "[skip ci] azure pipeline bump version number"
+            git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
+      - task: AzurePowerShell@4
+        displayName: Publish to gallery
+        inputs:
+          azureSubscription: 'Azure'
+          ScriptType: 'InlineScript'
+          Inline: |
+            Invoke-Build PublishToGallery -PsGalleryKey $(PSGalleryKey)          
