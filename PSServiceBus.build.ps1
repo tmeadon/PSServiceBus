@@ -7,6 +7,7 @@ param
 
     # API key used to authenticate against the PowerShellGallery
     [Parameter()]
+    [ValidateNotNullOrEmpty]
     [string]
     $PsGalleryKey,
 
@@ -85,4 +86,9 @@ task UpdateVersion {
         # overwrite the source manifest with the updated one
         Copy-Item -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -Destination $BuildRoot -Force
     }
+}
+
+task PublishToGallery {
+    Import-Module "$BuildRoot\output\PSServiceBus.psd1" -Force
+    Publish-Module -Name "PSServiceBus" -NuGetApiKey $PsGalleryKey -Repository 'PSGallery'
 }
