@@ -89,6 +89,10 @@ task UpdateVersion {
 }
 
 task PublishToGallery {
+    if (-not $PsGalleryKey)
+    {
+        throw "You must supply a value for the the -PSGalleryKey in order to run this task"
+    }
     Import-Module "$BuildRoot\output\PSServiceBus.psd1" -Force
     Publish-Module -Name "PSServiceBus" -NuGetApiKey $PsGalleryKey -Repository 'PSGallery'
 }
