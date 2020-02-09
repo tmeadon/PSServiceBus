@@ -6,6 +6,8 @@ variables:
     value: 1
   - name: Minor
     value: 0
+  - name: Hotfix
+    value: 1
   - name: Build
     value: $[counter('',0)]
 
@@ -53,13 +55,13 @@ stages:
     - job: test_windows
       steps:
       - task: AzurePowerShell@4
-        displayName: Run tests and bump version
+        displayName: Run tests
         inputs:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: |
             Set-Location -Path $(Build.SourcesDirectory)
-            Invoke-Build RunIntegrationTests -NewVersionNumber $(Build.BuildNumber)
+            Invoke-Build RunIntegrationTests
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
 
@@ -76,7 +78,7 @@ stages:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: |
-            Invoke-Build UpdateVersion
+            Invoke-Build UpdateVersion -NewVersionNumber ($(Major) + "." + $(Minor) + "." + $(Hotfix))
       - task: CmdLine@2
         displayName: Commit changes back to github
         inputs:
