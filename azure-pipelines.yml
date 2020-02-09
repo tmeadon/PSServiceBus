@@ -1,4 +1,4 @@
-name: $(Major).$(Minor).$(Build)
+name: $(Major).$(Minor).$(Hotfix).$(Build)
 
 variables:
   - group: secrets
