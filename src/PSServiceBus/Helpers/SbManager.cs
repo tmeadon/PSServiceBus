@@ -145,5 +145,19 @@ namespace PSServiceBus.Helpers
                     throw new NotImplementedException(string.Format("Maximum message size for sku '{0}' is unknown", sku.ToString()));
             }
         }
+
+        public long GetMessageBatchSize(string[] Messages)
+        {
+            long batchSize = 0;
+
+            for (int i = 0; i < Messages.Length; i++)
+            {
+                byte[] body = Encoding.UTF8.GetBytes(Messages[i]);
+                Message message = new Message(body);
+                batchSize += message.Size;
+            }
+            
+            return batchSize;
+        }
     }
 }
