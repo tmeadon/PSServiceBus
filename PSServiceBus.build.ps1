@@ -7,7 +7,6 @@ param
 
     # API key used to authenticate against the PowerShellGallery
     [Parameter()]
-    [ValidateNotNullOrEmpty]
     [string]
     $PsGalleryKey,
 
