@@ -67,6 +67,7 @@ stages:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: | 
+            Set-Location -Path $(Build.SourcesDirectory)
             Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
             Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
             Invoke-Build RunIntegrationTests
