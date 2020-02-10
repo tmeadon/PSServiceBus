@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Management.Automation;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
 using PSServiceBus.Helpers;
-using PSServiceBus.Exceptions;
-using Microsoft.Azure.ServiceBus.Core;
 using Microsoft.Azure.ServiceBus;
 
 namespace PSServiceBus.Cmdlets
@@ -20,7 +17,7 @@ namespace PSServiceBus.Cmdlets
     /// <para>This tests whether $namespaceConnectionString is valid or not.</para>
     /// </example>
     [Cmdlet(VerbsDiagnostic.Test, "SbMessageBatchSize")]
-    [OutputType(typeof(bool))]
+    [OutputType(typeof(SbMessageBatchTestResult))]
     public class TestSbMessageBatchSize : Cmdlet
     {
 
@@ -41,6 +38,27 @@ namespace PSServiceBus.Cmdlets
         /// </summary>
         protected override void ProcessRecord()
         {
+            SbMessageBatchTestResult result = new SbMessageBatchTestResult{
+                BatchSize = string.Format("{0}B", GetMessageBatchSize(Messages).ToString()),
+                NumberOfMessages = Messages.Length,
+                ValidForBasicSku = TestMessageBatch(Messages, MessagingSku.Basic),
+                ValidForStandardSku = TestMessageBatch(Messages, MessagingSku.Standard),
+                ValidForPremiumSku = TestMessageBatch(Messages, MessagingSku.Premium),
+                CurrentNamespaceSku = null,
+                ValidForCurrentNamespace = null
+            };
+
+            if (NamespaceConnectionString != null)
+            {
+                SbManager sbManager = new SbManager(NamespaceConnectionString);
+                MessagingSku currentSku = sbManager.GetNamespaceSku();
+
+                result.CurrentNamespaceSku = currentSku;
+                result.ValidForCurrentNamespace = TestMessageBatch(Messages, currentSku);
+            }
+
+            WriteObject(result);
+
         }
 
         public int GetMessageMaxSizeInBytes(MessagingSku sku)

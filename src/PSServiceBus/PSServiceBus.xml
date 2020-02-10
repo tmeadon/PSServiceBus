@@ -167,7 +167,7 @@
         </member>
         <member name="T:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch">
             <summary>
-            <para type="synopsis">Receivess messages in batch from an Azure Service Bus queue or subscription.</para>
+            <para type="synopsis">Receives messages in batch from an Azure Service Bus queue or subscription.</para>
             <para type="description">This cmdlet retrieves messages in batch from an Azure Service Bus queue or subscription. Two receive modes are available:</para>
             <para type="description">ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
             <para type="description">received using the -ReceiveQty parameter, they will be returned individually to the pipeline. Messages can also be</para>
@@ -293,6 +293,31 @@
             Main cmdlet method.
             </summary>
         </member>
+        <member name="T:PSServiceBus.Cmdlets.TestSbMessageBatchSize">
+            <summary>
+            <para type="synopsis">Tests whether a connection string is valid or not.</para>
+            <para type="description">Tests whether a connection string is valid or not.</para>
+            </summary>
+            <example>
+            <code>Test-SbConnectionString -NamespaceConnectionString $namespaceConnectionString</code>
+            <para>This tests whether $namespaceConnectionString is valid or not.</para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.TestSbMessageBatchSize.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.TestSbMessageBatchSize.Messages">
+            <summary>
+            <para type="description">Batch of messages to be tested</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.TestSbMessageBatchSize.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Enums.SbEntityTypes">
             <summary>
             Valid Service Bus entities
@@ -384,6 +409,46 @@
         <member name="F:PSServiceBus.Outputs.SbMessage.UserProperties">
             <summary>
             User Properties
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Outputs.SbMessageBatchTestResult">
+            <summary>
+            Contains the id and the body for a service bus message
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.BatchSize">
+            <summary>
+            Size of the batch
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.NumberOfMessages">
+            <summary>
+            Number of messages in the batch
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.ValidForBasicSku">
+            <summary>
+            Whether or not the batch is within the constraints of the 'basic' Service Bus Namespace sku
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.ValidForStandardSku">
+            <summary>
+            Whether or not the batch is within the constraints of the 'basic' Service Bus Namespace sku
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.ValidForPremiumSku">
+            <summary>
+            Whether or not the batch is within the constraints of the 'premium' Service Bus Namespace sku
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.CurrentNamespaceSku">
+            <summary>
+            Sku of the in-scope namespace
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.ValidForCurrentNamespace">
+            <summary>
+            Whether or not the batch is within the contstraints of the in-scope namespace
             </summary>
         </member>
         <member name="T:PSServiceBus.Outputs.SbQueue">
