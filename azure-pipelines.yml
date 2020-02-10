@@ -5,9 +5,9 @@ variables:
   - name: Major
     value: 1
   - name: Minor
-    value: 0
-  - name: Hotfix
     value: 1
+  - name: Hotfix
+    value: 0
   - name: Build
     value: $[counter('',0)]
 
