@@ -67,6 +67,8 @@ stages:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: |
+            Set-Location -Path $(Build.SourcesDirectory)
+            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
             Invoke-Build UpdateVersion -NewVersionNumber "$(Major).$(Minor).$(Hotfix)"
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
@@ -93,6 +95,8 @@ stages:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: |
+            Set-Location -Path $(Build.SourcesDirectory)
+            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
             Invoke-Build PublishToGallery -PsGalleryKey $(PSGalleryKey)
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
