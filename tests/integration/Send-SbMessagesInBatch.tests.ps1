@@ -46,7 +46,7 @@ Describe "Send-SbMessagesInBatch tests" {
 
     Context "Test sending to queue" {
 
-        It "should send a single message to the correct queue" {
+        It "should send a set of messages (2) to the correct queue" {
             $ServiceBusUtils.GetQueueRuntimeInfo($testQueue).MessageCountDetails.ActiveMessageCount | Should -Be 2
         }
 
@@ -59,7 +59,7 @@ Describe "Send-SbMessagesInBatch tests" {
 
     Context "Test sending to topic" {
 
-        It "should send a single message to the correct topic" {
+        It "should send a set of messages (2) to the correct topic" {
             $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $testSubscription).MessageCountDetails.ActiveMessageCount | Should -Be 2
         }
 
