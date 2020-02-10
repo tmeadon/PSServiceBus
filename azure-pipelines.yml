@@ -46,6 +46,8 @@ stages:
             Invoke-Build
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
+      - publish: $(System.DefaultWorkingDirectory)\output
+        artifact: PSServiceBus
 
   - stage: test 
     pool:
@@ -54,6 +56,11 @@ stages:
     jobs:
     - job: test_windows
       steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          source: current
+          artifactName: PSServiceBus
+          path: output
       - task: AzurePowerShell@4
         displayName: Run tests
         inputs:
@@ -62,7 +69,6 @@ stages:
           Inline: | 
             Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
             Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
-            Set-Location -Path $(Build.SourcesDirectory)
             Invoke-Build RunIntegrationTests
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
@@ -74,6 +80,11 @@ stages:
     jobs:
     - job: publish
       steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          source: current
+          artifactName: PSServiceBus
+          path: output
       - task: AzurePowerShell@4
         displayName: Bump version number
         inputs:
