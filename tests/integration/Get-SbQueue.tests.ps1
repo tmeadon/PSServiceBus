@@ -15,6 +15,10 @@ Describe "Get-SbQueue tests" {
     # send some messages to each queue and dead letter a portion
     $messagesToSendToEachQueue = 5
     $messagesToDeadLetter = 2
+    $messagesToScheduleToEachEntity = 4
+    $enqueueMinutesIntoFuture = 10
+
+    $enqueueDatetime = (Get-Date).AddMinutes($enqueueMinutesIntoFuture).ToUniversalTime()
 
     for ($i = 0; $i -lt $newQueues.Count; $i++)
     {
@@ -27,6 +31,11 @@ Describe "Get-SbQueue tests" {
         {
             $ServiceBusUtils.ReceiveAndDeadLetterAMessage($newQueues[$i])
         }
+
+        for ($j = 0; $j -lt $messagesToScheduleToEachEntity; $j++)
+        {
+            $ServiceBusUtils.ScheduleTestMessage($newQueues[$i], $enqueueDatetime)
+        }
     }
 
     # tests
@@ -34,7 +43,7 @@ Describe "Get-SbQueue tests" {
     Context "Output type tests" {
 
         It "should have an output type of PSServiceBus.Outputs.SbQueue" {
-            (Get-Command -Name "Get-SbQueue").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbQueue" 
+            (Get-Command -Name "Get-SbQueue").OutputType.Name | Should -Be "PSServiceBus.Outputs.SbQueue"
         }
         
     }
@@ -58,6 +67,13 @@ Describe "Get-SbQueue tests" {
             foreach ($item in $result)
             {
                 $item.DeadLetteredMessages | Should -EQ $messagesToDeadLetter
+            }
+        }
+
+        It "should return the correct number of scheduled messages in all queues" {
+            foreach ($item in $result)
+            {
+                $item.ScheduledMessageCount | Should -EQ $messagesToScheduleToEachEntity
             }
         }
     }
@@ -89,6 +105,12 @@ Describe "Get-SbQueue tests" {
             param ([string] $queueName)
             $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
             $result.DeadLetteredMessages | Should -EQ $messagesToDeadLetter
+        }
+
+        It "should return the correct number of scheduled messages in a specific queue" -TestCases $testCases {
+            param ([string] $queueName)
+            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            $result.ScheduledMessageCount | Should -EQ $messagesToScheduleToEachEntity
         }
     }
 

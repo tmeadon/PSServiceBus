@@ -1,5 +1,11 @@
 [CmdletBinding()]
-Param ()
+Param (
+    # Azure region to use for tests
+    [string] $Location = "UK South",
+
+    #SubcriptionId where you want the test to run against
+    [string] $SubscriptionId
+)
 
 # start a stopwatch to time test run
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
@@ -15,13 +21,14 @@ Import-Module $PSScriptRoot\..\utils\PSServiceBus.Tests.Utils\bin\Release\netsta
 # prepare for test run
 Write-Verbose -Message 'Preparing test run'
 
-$testEnvironment = Initialize-IntegrationTestRun -Location 'uk south'
+# Prepare the test objects.
+$testEnvironment = Initialize-IntegrationTestRun -Location $Location -SubscriptionId $SubscriptionId
 
 Write-Verbose -Message "Created environment $( $testEnvironment | ConvertTo-Json -Compress )"
 
 $sbUtils = [PSServiceBus.Tests.Utils.ServiceBusUtils]::new($testEnvironment.ConnectionString)
 
-$testResults = Invoke-Pester -Strict -PassThru -EnableExit -Script @{
+$testResults = Invoke-Pester -Strict -PassThru -Script @{
     Path = $PSScriptRoot
     Parameters = @{
         ServiceBusUtils = $sbUtils

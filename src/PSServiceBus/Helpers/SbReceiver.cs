@@ -6,6 +6,7 @@ using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Outputs;
 using PSServiceBus.Enums;
 using PSServiceBus.Exceptions;
+using System.Linq;
 
 namespace PSServiceBus.Helpers
 {
@@ -72,10 +73,26 @@ namespace PSServiceBus.Helpers
             switch (ReceiveType)
             {
                 case SbReceiveTypes.ReceiveAndKeep:
+                case SbReceiveTypes.PeekOnly:
                     return this.PeekMessages(NumberOfMessages);
 
                 case SbReceiveTypes.ReceiveAndDelete:
                     return this.ReceiveAndDelete(NumberOfMessages);
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public IList<SbMessage> ReceiveMessagesInBatch(int NumberOfMessages, SbReceiveTypes ReceiveType)
+        {
+            switch (ReceiveType)
+            {
+                case SbReceiveTypes.ReceiveAndKeep:
+                    return this.PeekMessagesInBatch(NumberOfMessages);
+
+                case SbReceiveTypes.ReceiveAndDelete:
+                    return this.ReceiveAndDeleteInBatch(NumberOfMessages);
 
                 default:
                     throw new NotImplementedException();
@@ -89,7 +106,7 @@ namespace PSServiceBus.Helpers
             for (int i = 0; i < NumberOfMessages; i++)
             {
                 Message message = messageReceiver.PeekBySequenceNumberAsync((messageReceiver.LastPeekedSequenceNumber + 1)).Result;
-
+                
                 if (message != null)
                 {
                     messages.Add(message);
@@ -98,6 +115,23 @@ namespace PSServiceBus.Helpers
                 {
                     break;
                 }
+            }
+            
+            return BuildMessageList(messages);
+        }
+
+        private IList<SbMessage> PeekMessagesInBatch(int NumberOfMessages)
+        {
+            IList<Message> messages = null;
+
+            try
+            {
+                messages = messageReceiver.PeekAsync(NumberOfMessages).Result;
+            }
+            catch (Exception E)
+            {
+                messages = new List<Message>();
+                throw new Exception("Something while peeking for messages in batch against the Service Bus.", E);
             }
             
             return BuildMessageList(messages);
@@ -142,6 +176,28 @@ namespace PSServiceBus.Helpers
                 throw;
             }
         }
+        
+        private IList<SbMessage> ReceiveAndDeleteInBatch(int NumberOfMessages)
+        {
+            IList<Message> messages = null;
+
+            try
+            {
+                messages = messageReceiver.ReceiveAsync(NumberOfMessages).Result;
+
+                if(messages != null && messages.Count > 0)
+                {
+                    messageReceiver.CompleteAsync(messages.Select(x => x.SystemProperties.LockToken).ToList());
+                }
+            }
+            catch (Exception E)
+            {
+                messages = new List<Message>();
+                throw new Exception("Something while Receiving & Deleting messages in batch against the Service Bus.", E); ;
+            }
+
+            return BuildMessageList(messages);
+        }
 
         private MessageReceiver CreateMessageReceiver(string NamespaceConnectionString, string EntityPath, ReceiveMode Mode)
         {
@@ -165,11 +221,29 @@ namespace PSServiceBus.Helpers
                 result.Add(new SbMessage
                 {
                     MessageId = message.MessageId,
-                    MessageBody = ConvertMessageBodyToString(message.Body)
+                    MessageBody = ConvertMessageBodyToString(message.Body),
+                    SystemProperties = ConvertSystemPropertiesToIDictonary(message.SystemProperties),
+                    UserProperties = message.UserProperties
                 });
             }
 
             return result;
+        }
+
+        private IDictionary<string, object> ConvertSystemPropertiesToIDictonary(Message.SystemPropertiesCollection systemProperties)
+        {
+            IDictionary<string, object> res = new Dictionary<string, object>();
+            res.Add("DeadLetterSource", systemProperties.DeadLetterSource);
+            res.Add("DeliveryCount", systemProperties.DeliveryCount);
+            res.Add("EnqueuedSequenceNumber", systemProperties.EnqueuedSequenceNumber);
+            res.Add("EnqueuedTimeUtc", systemProperties.EnqueuedTimeUtc);
+            res.Add("IsLockTokenSet", systemProperties.IsLockTokenSet);
+            res.Add("IsReceived", systemProperties.IsReceived);
+            res.Add("LockedUntilUtc", systemProperties.LockedUntilUtc);
+            res.Add("LockToken", systemProperties.LockToken);
+            res.Add("SequenceNumber", systemProperties.SequenceNumber);
+
+            return res;
         }
     }
 }

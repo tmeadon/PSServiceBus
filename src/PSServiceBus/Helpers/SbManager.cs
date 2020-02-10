@@ -87,6 +87,13 @@ namespace PSServiceBus.Helpers
             return managementClient.GetSubscriptionRuntimeInfoAsync(TopicName, SubscriptionName).Result;
         }
 
+        public TopicRuntimeInfo GetTopicRuntimeInfo(string TopicName)
+        {
+            this.GetTopicByName(TopicName);
+
+            return managementClient.GetTopicRuntimeInfoAsync(TopicName).Result;
+        }
+
         public bool QueueOrTopicExists(string entityPath, SbEntityTypes entityType)
         {
             switch (entityType)
@@ -121,6 +128,24 @@ namespace PSServiceBus.Helpers
         public string BuildDeadLetterPath(string EntityPath)
         {
             return EntityNameHelper.FormatDeadLetterPath(EntityPath);
+        }
+
+        public int GetMessageMaxSizeInBytes()
+        {
+            MessagingSku sku = this.managementClient.GetNamespaceInfoAsync().Result.MessagingSku;
+
+            switch (sku)
+            {
+                case MessagingSku.Basic:
+                case MessagingSku.Standard:
+                    return 256000;
+                
+                case MessagingSku.Premium:
+                    return 1000000;
+
+                default:
+                    throw new NotImplementedException(string.Format("Maximum message size for sku '{0}' is unknown", sku.ToString()));
+            }
         }
     }
 }

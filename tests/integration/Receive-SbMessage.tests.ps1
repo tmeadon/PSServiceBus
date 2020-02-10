@@ -9,9 +9,9 @@ Describe "Receive-SbMessage tests" {
 
     # setup
 
-    # create some queues, topics and subscriptions and allow time for it to complete 
+    # create some queues, topics and subscriptions and allow time for it to complete
 
-    $queues = $ServiceBusUtils.CreateQueues(4)
+    $queues = $ServiceBusUtils.CreateQueues(6)
 
     $testTopic = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopic)
@@ -84,6 +84,18 @@ Describe "Receive-SbMessage tests" {
             $result.count | Should -Be 1
         }
 
+        It "should contain SystemProperties property on the SbMessage object" {
+            $queue = $queues[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            $null -eq $result.SystemProperties | Should -be $false
+        }
+
+        It "should contain UserProperties property on the SbMessage object" {
+            $queue = $queues[0]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            $null -eq $result.UserProperties | Should -be $false
+        }
+
         It "should receive the correct number of messages if -NumberOfMessagesToRetrieve is supplied" -TestCases @{messages = 2}, @{messages = 3} {
             param ([int] $messages)
             $queue = $queues[1]
@@ -97,8 +109,26 @@ Describe "Receive-SbMessage tests" {
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
         }
 
+        It "should leave messages in the queue after being received if -ReceiveType is PeekOnly" {
+            $queue = $queues[3]
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve 2 -ReceiveType PeekOnly
+            $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
+        }
+
+        It "should write warning message notifying the user that they should use PeekOnly instead of ReceiveAndKeep" {
+            $queue = $queues[4]
+            $temp = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve 2 -ReceiveType ReceiveAndKeep 3>&1 
+            $temp[0].Message | Should -Be "The option ReceiveAndKeep will be deprecated in future versions. Please use 'PeekOnly' instead."
+        }
+
+        It "should leave messages in the queue after being received if -ReceiveType is ReceiveAndKeep" {
+            $queue = $queues[4]
+            Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve 2 -ReceiveType ReceiveAndKeep
+            $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be ($messagesToSendToEachEntity - $messagesToDeadLetter)
+        }
+
         It "should remove messages from the queue after being received if -ReceiveType ReceiveAndDelete is supplied" {
-            $queue = $queues[2]
+            $queue = $queues[4]
             $messagesToRemove = 2
             Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve $messagesToRemove -ReceiveType ReceiveAndDelete
             Start-Sleep -Seconds 1
@@ -106,7 +136,7 @@ Describe "Receive-SbMessage tests" {
         }
 
         It "should receive messages from the dead letter queue if -ReceiveFromDeadLetterQueue is supplied" {
-            $queue = $queues[3]
+            $queue = $queues[5]
             $messagesToReceive = 1
             Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve $messagesToReceive -ReceiveType ReceiveAndDelete -ReceiveFromDeadLetterQueue
             Start-Sleep -Seconds 1

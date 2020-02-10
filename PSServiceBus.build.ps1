@@ -5,10 +5,20 @@ param
     [version]
     $NewVersionNumber,
 
-    # Version number to stamp module manifest with
+    # API key used to authenticate against the PowerShellGallery
     [Parameter()]
     [string]
-    $PsGalleryKey
+    $PsGalleryKey,
+
+    #SubcriptionId where you want the test to run against
+    [Parameter()]
+    [string]
+    $TestLocation = "UK South",
+    
+    #SubcriptionId where you want the test to run against
+    [Parameter()]
+    [string]
+    $TestSubscriptionId
 )
 
 task . LintPowerShellFunctions, CleanModule, BuildModule, CopyFiles, CleanIntegrationTests, BuildIntegrationTests, UpdateVersion
@@ -62,7 +72,7 @@ task BuildIntegrationTests {
 }
 
 task RunIntegrationTests {
-    $testResults = & "$BuildRoot\tests\integration\Start-Tests.ps1" -Verbose
+    $testResults = & "$BuildRoot\tests\integration\Start-Tests.ps1" -SubscriptionId $TestSubscriptionId -Location $TestLocation -Verbose
     assert($testResults.FailedCount -eq 0) ("Failed $( $testResults.FailedCount ) integration tests.")
 }
 
@@ -75,4 +85,12 @@ task UpdateVersion {
         # overwrite the source manifest with the updated one
         Copy-Item -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -Destination $BuildRoot -Force
     }
+}
+
+task PublishToGallery {
+    if (-not $PsGalleryKey)
+    {
+        throw "You must supply a value for the the -PSGalleryKey in order to run this task"
+    }
+    Publish-Module -Path "$BuildRoot\output\PSServiceBus" -NuGetApiKey $PsGalleryKey -Repository 'PSGallery'
 }
