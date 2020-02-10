@@ -7,7 +7,7 @@ using PSServiceBus.Enums;
 namespace PSServiceBus.Cmdlets
 {
     /// <summary>
-    /// <para type="synopsis">Receivess messages in batch from an Azure Service Bus queue or subscription.</para>
+    /// <para type="synopsis">Receives messages in batch from an Azure Service Bus queue or subscription.</para>
     /// <para type="description">This cmdlet retrieves messages in batch from an Azure Service Bus queue or subscription. Two receive modes are available:</para>
     /// <para type="description">ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
     /// <para type="description">received using the -ReceiveQty parameter, they will be returned individually to the pipeline. Messages can also be</para>
