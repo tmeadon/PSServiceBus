@@ -20,11 +20,6 @@ trigger:
     exclude:
       - README.md
 
-pr:
-  branches:
-    include:
-    - master
-
 stages:
 
   - stage: build_test_publish
