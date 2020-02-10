@@ -37,11 +37,11 @@ namespace PSServiceBus.Outputs
         /// <summary>
         /// Sku of the in-scope namespace
         /// </summary>
-        public MessagingSku CurrentNamespaceSku;
+        public MessagingSku? CurrentNamespaceSku;
 
         /// <summary>
         /// Whether or not the batch is within the contstraints of the in-scope namespace
         /// </summary>
-        public bool ValidForCurrentNamespace;
+        public bool? ValidForCurrentNamespace;
     }
 }
