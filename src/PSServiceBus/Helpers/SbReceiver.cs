@@ -14,9 +14,15 @@ namespace PSServiceBus.Helpers
     {
         private readonly MessageReceiver messageReceiver;
 
-
-        public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager)
+        public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager, bool PurgeMode = false)
         {
+            ReceiveMode receiveMode = ReceiveMode.PeekLock;
+
+            if(PurgeMode)
+            {
+                receiveMode = ReceiveMode.ReceiveAndDelete;
+            }
+
             if (sbManager.QueueOrTopicExists(QueueName, SbEntityTypes.Queue))
             {
                 string entityPath = QueueName;
@@ -26,7 +32,7 @@ namespace PSServiceBus.Helpers
                     entityPath = sbManager.BuildDeadLetterPath(QueueName);
                 }
 
-                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, entityPath);
+                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, entityPath, receiveMode);
             }
             else
             {
@@ -34,8 +40,15 @@ namespace PSServiceBus.Helpers
             }
         }
 
-        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager)
+        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager, bool PurgeMode = false)
         {
+            ReceiveMode receiveMode = ReceiveMode.PeekLock;
+
+            if (PurgeMode)
+            {
+                receiveMode = ReceiveMode.ReceiveAndDelete;
+            }
+
             if (sbManager.SubscriptionExists(TopicName, SubscriptionName))
             {
                 string subscriptionPath = sbManager.BuildSubscriptionPath(TopicName, SubscriptionName);
@@ -46,7 +59,7 @@ namespace PSServiceBus.Helpers
                     entityPath = sbManager.BuildDeadLetterPath(subscriptionPath);
                 }
 
-                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, entityPath);
+                this.messageReceiver = CreateMessageReceiver(NamespaceConnectionString, entityPath, receiveMode);
             }
             else
             {
@@ -112,9 +125,27 @@ namespace PSServiceBus.Helpers
             return BuildMessageList(messages);
         }
 
-        private MessageReceiver CreateMessageReceiver(string NamespaceConnectionString, string EntityPath)
+        public void PurgeMessages()
         {
-            MessageReceiver messageReceiver = new MessageReceiver(NamespaceConnectionString, EntityPath);
+            try
+            {
+                IList<Message> res = null;
+
+                do
+                {
+                    res = messageReceiver.ReceiveAsync(100,TimeSpan.FromSeconds(1)).Result;
+                } while (res != null && res.Count > 0);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private MessageReceiver CreateMessageReceiver(string NamespaceConnectionString, string EntityPath, ReceiveMode Mode)
+        {
+            MessageReceiver messageReceiver = new MessageReceiver(NamespaceConnectionString, EntityPath, Mode);
             messageReceiver.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
             return messageReceiver;
         }

@@ -72,7 +72,7 @@ NestedModules = @('bin\PSServiceBus.dll')
 FunctionsToExport = 'Save-SbConnectionString'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 'Get-SbQueue', 'Get-SbTopic', 'Get-SbSubscription', 'Send-SbMessage', 
+CmdletsToExport = 'Clear-SbQueue', 'Get-SbQueue', 'Get-SbTopic', 'Get-SbSubscription', 'Send-SbMessage', 
                'Receive-SbMessage', 'Test-SbConnectionString'
 
 # Variables to export from this module
