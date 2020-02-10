@@ -67,7 +67,7 @@ stages:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: |
-            Invoke-Build UpdateVersion -NewVersionNumber ($(Major) + "." + $(Minor) + "." + $(Hotfix))
+            Invoke-Build UpdateVersion -NewVersionNumber "$(Major).$(Minor).$(Hotfix)"
         condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
         continueOnError: false
 
