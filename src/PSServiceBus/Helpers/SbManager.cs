@@ -130,10 +130,8 @@ namespace PSServiceBus.Helpers
             return EntityNameHelper.FormatDeadLetterPath(EntityPath);
         }
 
-        public int GetMessageMaxSizeInBytes()
+        public int GetMessageMaxSizeInBytes(MessagingSku sku)
         {
-            MessagingSku sku = this.managementClient.GetNamespaceInfoAsync().Result.MessagingSku;
-
             switch (sku)
             {
                 case MessagingSku.Basic:
