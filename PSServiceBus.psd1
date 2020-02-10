@@ -8,126 +8,138 @@
 
 @{
 
-# Script module or binary module file associated with this manifest.
-RootModule = 'PSServiceBus.psm1'
+    # Script module or binary module file associated with this manifest.
+    RootModule        = 'PSServiceBus.psm1'
 
-# Version number of this module.
-ModuleVersion = '1.1.0'
+    # Version number of this module.
+    ModuleVersion     = '1.1.0'
 
-# Supported PSEditions
-# CompatiblePSEditions = @()
+    # Supported PSEditions
+    # CompatiblePSEditions = @()
 
-# ID used to uniquely identify this module
-GUID = 'cc0dbb5d-b28c-43d5-aa39-2f41338e927d'
+    # ID used to uniquely identify this module
+    GUID              = 'cc0dbb5d-b28c-43d5-aa39-2f41338e927d'
 
-# Author of this module
-Author = 'tommagumma'
+    # Author of this module
+    Author            = 'tommagumma'
 
-# Company or vendor of this module
-CompanyName = ''
+    # Company or vendor of this module
+    CompanyName       = ''
 
-# Copyright statement for this module
-Copyright = '(c) 2019 tommagumma. All rights reserved.'
+    # Copyright statement for this module
+    Copyright         = '(c) 2019 tommagumma. All rights reserved.'
 
-# Description of the functionality provided by this module
-Description = 'A PowerShell module for interacting with Azure Service Bus.'
+    # Description of the functionality provided by this module
+    Description       = 'A PowerShell module for interacting with Azure Service Bus.'
 
-# Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '5.1'
+    # Minimum version of the Windows PowerShell engine required by this module
+    PowerShellVersion = '5.1'
 
-# Name of the Windows PowerShell host required by this module
-# PowerShellHostName = ''
+    # Name of the Windows PowerShell host required by this module
+    # PowerShellHostName = ''
 
-# Minimum version of the Windows PowerShell host required by this module
-# PowerShellHostVersion = ''
+    # Minimum version of the Windows PowerShell host required by this module
+    # PowerShellHostVersion = ''
 
-# Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-# DotNetFrameworkVersion = ''
+    # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
+    # DotNetFrameworkVersion = ''
 
-# Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-# CLRVersion = ''
+    # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
+    # CLRVersion = ''
 
-# Processor architecture (None, X86, Amd64) required by this module
-# ProcessorArchitecture = ''
+    # Processor architecture (None, X86, Amd64) required by this module
+    # ProcessorArchitecture = ''
 
-# Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+    # Modules that must be imported into the global environment prior to importing this module
+    # RequiredModules = @()
 
-# Assemblies that must be loaded prior to importing this module
-# RequiredAssemblies = @()
+    # Assemblies that must be loaded prior to importing this module
+    # RequiredAssemblies = @()
 
-# Script files (.ps1) that are run in the caller's environment prior to importing this module.
-# ScriptsToProcess = @()
+    # Script files (.ps1) that are run in the caller's environment prior to importing this module.
+    # ScriptsToProcess = @()
 
-# Type files (.ps1xml) to be loaded when importing this module
-# TypesToProcess = @()
+    # Type files (.ps1xml) to be loaded when importing this module
+    # TypesToProcess = @()
 
-# Format files (.ps1xml) to be loaded when importing this module
-# FormatsToProcess = @()
+    # Format files (.ps1xml) to be loaded when importing this module
+    # FormatsToProcess = @()
 
-# Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('bin\PSServiceBus.dll')
+    # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
+    NestedModules     = @('bin\PSServiceBus.dll')
 
-# Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Save-SbConnectionString'
+    # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
+    FunctionsToExport = 'Save-SbConnectionString'
 
-# Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 'Get-SbQueue', 'Get-SbTopic', 'Get-SbSubscription', 'Send-SbMessage', 'Send-SbMessagesInBatch',
-               'Receive-SbMessage', 'Receive-SbMessageInBatch', 'Test-SbConnectionString'
+    # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
+    CmdletsToExport   = @(
+        'Get-SbQueue',
 
-# Variables to export from this module
-# VariablesToExport = @()
+        'Get-SbTopic',
+        'Get-SbSubscription',
 
-# Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = @()
+        'Send-SbMessage',
+        'Send-SbMessagesInBatch',
+        
+        'Receive-SbMessage',
+        'Receive-SbMessagesInBatch',
+        
+        'Test-SbConnectionString'
+    )
 
-# DSC resources to export from this module
-# DscResourcesToExport = @()
+    # Variables to export from this module
+    # VariablesToExport = @()
 
-# List of all modules packaged with this module
-# ModuleList = @()
+    # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
+    AliasesToExport   = @()
 
-# List of all files packaged with this module
-# FileList = @()
+    # DSC resources to export from this module
+    # DscResourcesToExport = @()
 
-# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-PrivateData = @{
+    # List of all modules packaged with this module
+    # ModuleList = @()
 
-    PSData = @{
+    # List of all files packaged with this module
+    # FileList = @()
 
-        # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'AzureServiceBus','Queues','Topics','ServiceBus'
+    # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
+    PrivateData       = @{
 
-        # A URL to the license for this module.
-        # LicenseUri = ''
+        PSData = @{
 
-        # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/tommagumma/PSServiceBus'
+            # Tags applied to this module. These help with module discovery in online galleries.
+            Tags       = 'AzureServiceBus', 'Queues', 'Topics', 'ServiceBus'
 
-        # A URL to an icon representing this module.
-        # IconUri = ''
+            # A URL to the license for this module.
+            # LicenseUri = ''
 
-        # ReleaseNotes of this module
-        # ReleaseNotes = ''
+            # A URL to the main website for this project.
+            ProjectUri = 'https://github.com/tommagumma/PSServiceBus'
 
-        # Prerelease string of this module
-        # Prerelease = ''
+            # A URL to an icon representing this module.
+            # IconUri = ''
 
-        # Flag to indicate whether the module requires explicit user acceptance for install/update/save
-        # RequireLicenseAcceptance = $false
+            # ReleaseNotes of this module
+            # ReleaseNotes = ''
 
-        # External dependent modules of this module
-        # ExternalModuleDependencies = @()
+            # Prerelease string of this module
+            # Prerelease = ''
 
-    } # End of PSData hashtable
+            # Flag to indicate whether the module requires explicit user acceptance for install/update/save
+            # RequireLicenseAcceptance = $false
 
- } # End of PrivateData hashtable
+            # External dependent modules of this module
+            # ExternalModuleDependencies = @()
 
-# HelpInfo URI of this module
-# HelpInfoURI = ''
+        } # End of PSData hashtable
 
-# Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
-# DefaultCommandPrefix = ''
+    } # End of PrivateData hashtable
+
+    # HelpInfo URI of this module
+    # HelpInfoURI = ''
+
+    # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
+    # DefaultCommandPrefix = ''
 
 }
 
