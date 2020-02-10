@@ -9,12 +9,15 @@ using Microsoft.Azure.ServiceBus;
 namespace PSServiceBus.Cmdlets
 {
     /// <summary>
-    /// <para type="synopsis">Tests whether a connection string is valid or not.</para>
-    /// <para type="description">Tests whether a connection string is valid or not.</para>
+    /// <para type="synopsis">Tests whether a message batch is valid for a range of different namespace skus</para>
+    /// <para type="description">The different Service Bus Namespaces skus have different limits for the maximum message or message batch size.</para>
+    /// <para type="description">This cmdlet tests whether a given message batch is valid for the different skus.  If the -NamespaceConnectionString</para>
+    /// <para type="description">parameter is supplied then the batch is also evaluated against the in-scope namespace.</para>
     /// </summary>
     /// <example>
-    /// <code>Test-SbConnectionString -NamespaceConnectionString $namespaceConnectionString</code>
-    /// <para>This tests whether $namespaceConnectionString is valid or not.</para>
+    /// <code>Test-SbMessageBatchSize -Messages $messagesToSend -NamespaceConnectionString $namespaceConnectionString</code>
+    /// <para>This tests whether the message batch $messagesToSend is within the contsraints of the various namespace skus, including</para>
+    /// <para>the namespace $namespaceConnectionString.</para>
     /// </example>
     [Cmdlet(VerbsDiagnostic.Test, "SbMessageBatchSize")]
     [OutputType(typeof(SbMessageBatchTestResult))]
