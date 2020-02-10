@@ -6,6 +6,7 @@ using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Outputs;
 using PSServiceBus.Enums;
 using PSServiceBus.Exceptions;
+using System.Linq;
 
 namespace PSServiceBus.Helpers
 {
@@ -70,6 +71,21 @@ namespace PSServiceBus.Helpers
             }
         }
 
+        public IList<SbMessage> ReceiveMessagesInBatch(int NumberOfMessages, SbReceiveTypes ReceiveType)
+        {
+            switch (ReceiveType)
+            {
+                case SbReceiveTypes.ReceiveAndKeep:
+                    return this.PeekMessagesInBatch(NumberOfMessages);
+
+                case SbReceiveTypes.ReceiveAndDelete:
+                    return this.ReceiveAndDeleteInBatch(NumberOfMessages);
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         private IList<SbMessage> PeekMessages(int NumberOfMessages)
         {
             IList<Message> messages = new List<Message>();
@@ -86,6 +102,23 @@ namespace PSServiceBus.Helpers
                 {
                     break;
                 }
+            }
+            
+            return BuildMessageList(messages);
+        }
+
+        private IList<SbMessage> PeekMessagesInBatch(int NumberOfMessages)
+        {
+            IList<Message> messages = null;
+
+            try
+            {
+                messages = messageReceiver.PeekAsync(NumberOfMessages).Result;
+            }
+            catch (Exception E)
+            {
+                messages = new List<Message>();
+                throw new Exception("Something while peeking for messages in batch against the Service Bus.", E);
             }
             
             return BuildMessageList(messages);
@@ -108,6 +141,28 @@ namespace PSServiceBus.Helpers
                 {
                     break;
                 }
+            }
+
+            return BuildMessageList(messages);
+        }
+
+        private IList<SbMessage> ReceiveAndDeleteInBatch(int NumberOfMessages)
+        {
+            IList<Message> messages = null;
+
+            try
+            {
+                messages = messageReceiver.ReceiveAsync(NumberOfMessages).Result;
+
+                if(messages != null && messages.Count > 0)
+                {
+                    messageReceiver.CompleteAsync(messages.Select(x => x.SystemProperties.LockToken).ToList());
+                }
+            }
+            catch (Exception E)
+            {
+                messages = new List<Message>();
+                throw new Exception("Something while Receiving & Deleting messages in batch against the Service Bus.", E); ;
             }
 
             return BuildMessageList(messages);
