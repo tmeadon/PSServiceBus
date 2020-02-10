@@ -92,6 +92,5 @@ task PublishToGallery {
     {
         throw "You must supply a value for the the -PSGalleryKey in order to run this task"
     }
-    Import-Module "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -Force
-    Publish-Module -Name "PSServiceBus" -NuGetApiKey $PsGalleryKey -Repository 'PSGallery'
+    Publish-Module -Path "$BuildRoot\output\PSServiceBus" -NuGetApiKey $PsGalleryKey -Repository 'PSGallery'
 }
