@@ -43,6 +43,5 @@ namespace PSServiceBus.Outputs
         /// Whether or not the batch is within the contstraints of the in-scope namespace
         /// </summary>
         public bool ValidForCurrentNamespace;
-
     }
 }
