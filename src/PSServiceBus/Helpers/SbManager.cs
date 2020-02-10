@@ -129,5 +129,10 @@ namespace PSServiceBus.Helpers
         {
             return EntityNameHelper.FormatDeadLetterPath(EntityPath);
         }
+
+        public MessagingSku GetNamespaceSku()
+        {
+            return this.managementClient.GetNamespaceInfoAsync().Result.MessagingSku;
+        }
     }
 }
