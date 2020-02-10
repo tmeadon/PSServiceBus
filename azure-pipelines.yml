@@ -34,19 +34,17 @@ stages:
     - job: build_test_publish
       steps:
 
-      - task: AzurePowerShell@4
+      - task: PowerShell@2
         displayName: Install dependant modules and build
         inputs:
-          azureSubscription: 'Azure'
-          ScriptType: 'InlineScript'
-          Inline: |
+          targetType: inline
+          script: |
             Set-Location -Path $(Build.SourcesDirectory)
             Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
             Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
             Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
             Invoke-Build
-          FailOnStandardError: true
-          azurePowerShellVersion: 'LatestVersion'
+          failOnStderr: true
 
       - task: AzurePowerShell@4
         displayName: Run tests
@@ -79,7 +77,7 @@ stages:
             git commit -m "[skip ci] azure pipeline bump version number"
             git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
         condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
-        
+
       - task: AzurePowerShell@4
         displayName: Publish to gallery
         inputs:
