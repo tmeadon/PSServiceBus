@@ -129,35 +129,5 @@ namespace PSServiceBus.Helpers
         {
             return EntityNameHelper.FormatDeadLetterPath(EntityPath);
         }
-
-        public int GetMessageMaxSizeInBytes(MessagingSku sku)
-        {
-            switch (sku)
-            {
-                case MessagingSku.Basic:
-                case MessagingSku.Standard:
-                    return 256000;
-                
-                case MessagingSku.Premium:
-                    return 1000000;
-
-                default:
-                    throw new NotImplementedException(string.Format("Maximum message size for sku '{0}' is unknown", sku.ToString()));
-            }
-        }
-
-        public long GetMessageBatchSize(string[] Messages)
-        {
-            long batchSize = 0;
-
-            for (int i = 0; i < Messages.Length; i++)
-            {
-                byte[] body = Encoding.UTF8.GetBytes(Messages[i]);
-                Message message = new Message(body);
-                batchSize += message.Size;
-            }
-            
-            return batchSize;
-        }
     }
 }
