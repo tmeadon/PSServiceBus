@@ -273,6 +273,45 @@
             Main cmdlet method.
             </summary>
         </member>
+        <member name="T:PSServiceBus.Cmdlets.SendSbMessagesInBatch">
+            <summary>
+            <para type="synopsis">Sends a set of messages to an Azure Service Bus queue or topic.</para>
+            <para type="description">Sends a set of messages to an Azure Service Bus queue or topic.</para>
+            </summary>
+            <example>
+            <code>Send-SbMessagesInBatch -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue' -Messages '{ "example": "message1" }','{ "example": "message2" }'</code>
+            <para>This sends a set of messages to the queue 'example-queue' with body '{ "example": "message1" }','{ "example": "message2" }'.</para>
+            </example>
+            <example>
+            <code>Send-SbMessagesInBatch -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -Messages '{ "example": "message1" }','{ "example": "message2" }'</code>
+            <para>This sends a set of messages to the topic 'example-topic' with body '{ "example": "message1" }','{ "example": "message2" }'.</para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessagesInBatch.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessagesInBatch.QueueName">
+            <summary>
+            <para type="description">Name of the queue to send a message to.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessagesInBatch.TopicName">
+            <summary>
+            <para type="description">Name of the topic to send a message to.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.SendSbMessagesInBatch.Messages">
+            <summary>
+            <para type="description">Set of the messages to send.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.SendSbMessagesInBatch.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Cmdlets.TestSbConnectionString">
             <summary>
             <para type="synopsis">Tests whether a connection string is valid or not.</para>
