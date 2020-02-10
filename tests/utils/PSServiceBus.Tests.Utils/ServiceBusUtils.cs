@@ -116,6 +116,16 @@ namespace PSServiceBus.Tests.Utils
             sender.SendAsync(message);
         }
 
+        public void ScheduleTestMessage(string entityName, DateTime enqueueDatetimeUtc)
+        {
+            MessageSender sender = new MessageSender(this.NamespaceConnectionString, entityName, null);
+            sender.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
+            var guid = Guid.NewGuid().ToString();
+            byte[] body = Encoding.UTF8.GetBytes("{ 'id': '" + guid + "' }");
+            Message message = new Message(body);
+            sender.ScheduleMessageAsync(message, enqueueDatetimeUtc);
+        }
+
         public string ReceiveAndCompleteAMessage(string entityName)
         {
             MessageReceiver receiver = new MessageReceiver(this.NamespaceConnectionString, entityName);
@@ -147,6 +157,11 @@ namespace PSServiceBus.Tests.Utils
         public SubscriptionRuntimeInfo GetSubscriptionRuntimeInfo(string topicName, string subscriptionName)
         {
             return this.managementClient.GetSubscriptionRuntimeInfoAsync(topicName, subscriptionName).Result;
+        }
+
+        public TopicRuntimeInfo GetTopicRuntimeInfo(string topicName)
+        {
+            return this.managementClient.GetTopicRuntimeInfoAsync(topicName).Result;
         }
 
         public void SendMessage(string entityName, string messageBody)

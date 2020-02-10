@@ -1,58 +1,98 @@
-name: $(Major).$(Minor).$(Build)
+name: $(Major).$(Minor).$(Hotfix).$(Build)
 
 variables:
   - group: secrets
   - name: Major
     value: 1
   - name: Minor
+    value: 1
+  - name: Hotfix
     value: 0
   - name: Build
     value: $[counter('',0)]
 
 trigger:
+  branches:
+    include:
+    - master
+    - refs/tags/*
   paths:
     exclude:
       - README.md
 
-pool:
-  vmImage: 'windows-latest'
+stages:
 
-steps:
+  - stage: build_test_publish
+    pool:
+      vmImage: 'windows-latest'
+    jobs:
+    - job: build_test_publish
+      steps:
 
-- task: AzurePowerShell@4
-  displayName: Install dependant modules and build
-  inputs:
-    azureSubscription: 'Azure'
-    ScriptType: 'InlineScript'
-    Inline: |
-      Set-Location -Path $(Build.SourcesDirectory)
-      Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
-      Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
-      Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
-      Invoke-Build
-    FailOnStandardError: true
-    azurePowerShellVersion: 'LatestVersion'
+      - task: PowerShell@2
+        displayName: Install dependant modules and build
+        inputs:
+          targetType: inline
+          script: |
+            Set-Location -Path $(Build.SourcesDirectory)
+            Install-Module -Name "PSScriptAnalyzer" -RequiredVersion 1.18.3 -Force
+            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
+            Invoke-Build
+          failOnStderr: true
+        continueOnError: false
 
-- task: AzurePowerShell@4
-  displayName: Run tests and bump version
-  inputs:
-    azureSubscription: 'Azure'
-    ScriptType: 'InlineScript'
-    Inline: |
-      Set-Location -Path $(Build.SourcesDirectory)
-      Invoke-Build runTestsBumpVersion -NewVersionNumber $(Build.BuildNumber)
-    FailOnStandardError: true
-    azurePowerShellVersion: 'LatestVersion'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+      - task: AzurePowerShell@4
+        displayName: Run tests
+        inputs:
+          azureSubscription: 'Azure'
+          ScriptType: 'InlineScript'
+          Inline: | 
+            Set-Location -Path $(Build.SourcesDirectory)
+            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
+            Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
+            Invoke-Build RunIntegrationTests
+          FailOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
+        condition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+        continueOnError: false
 
-- task: CmdLine@2
-  displayName: Commit changes back to github
-  inputs:
-    script: |
-      git config user.email pipeline@tommagumma.com
-      git config user.name 'AzurePipeline'
-      git checkout -b master
-      git add *
-      git commit -m "[skip ci] azure pipeline bump version number"
-      git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
-      
+      - task: AzurePowerShell@4
+        displayName: Bump version number
+        inputs:
+          azureSubscription: 'Azure'
+          ScriptType: 'InlineScript'
+          Inline: |
+            Set-Location -Path $(Build.SourcesDirectory)
+            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
+            Invoke-Build UpdateVersion -NewVersionNumber "$(Major).$(Minor).$(Hotfix)"
+          FailOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+        continueOnError: false
+        
+
+      - task: CmdLine@2
+        displayName: Commit changes back to github
+        inputs:
+          script: |
+            git config user.email pipeline@tommagumma.com
+            git config user.name 'AzurePipeline'
+            git checkout -b master
+            git add *
+            git commit -m "[skip ci] azure pipeline bump version number"
+            git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+        continueOnError: false
+
+      - task: AzurePowerShell@4
+        displayName: Publish to gallery
+        inputs:
+          azureSubscription: 'Azure'
+          ScriptType: 'InlineScript'
+          Inline: |
+            Set-Location -Path $(Build.SourcesDirectory)
+            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
+            Invoke-Build PublishToGallery -PsGalleryKey $(PSGalleryKey)
+          FailOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')

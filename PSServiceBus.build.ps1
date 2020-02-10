@@ -86,3 +86,11 @@ task UpdateVersion {
         Copy-Item -Path "$BuildRoot\output\PSServiceBus\PSServiceBus.psd1" -Destination $BuildRoot -Force
     }
 }
+
+task PublishToGallery {
+    if (-not $PsGalleryKey)
+    {
+        throw "You must supply a value for the the -PSGalleryKey in order to run this task"
+    }
+    Publish-Module -Path "$BuildRoot\output\PSServiceBus" -NuGetApiKey $PsGalleryKey -Repository 'PSGallery'
+}

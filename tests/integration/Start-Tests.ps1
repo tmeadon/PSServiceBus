@@ -28,7 +28,7 @@ Write-Verbose -Message "Created environment $( $testEnvironment | ConvertTo-Json
 
 $sbUtils = [PSServiceBus.Tests.Utils.ServiceBusUtils]::new($testEnvironment.ConnectionString)
 
-$testResults = Invoke-Pester -Strict -PassThru -EnableExit -Script @{
+$testResults = Invoke-Pester -Strict -PassThru -Script @{
     Path = $PSScriptRoot
     Parameters = @{
         ServiceBusUtils = $sbUtils
