@@ -68,8 +68,11 @@ stages:
           ScriptType: 'InlineScript'
           Inline: |
             Invoke-Build UpdateVersion -NewVersionNumber "$(Major).$(Minor).$(Hotfix)"
+          FailOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
         condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
         continueOnError: false
+        
 
       - task: CmdLine@2
         displayName: Commit changes back to github
@@ -91,4 +94,6 @@ stages:
           ScriptType: 'InlineScript'
           Inline: |
             Invoke-Build PublishToGallery -PsGalleryKey $(PSGalleryKey)
+          FailOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
         condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
