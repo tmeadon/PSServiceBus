@@ -27,12 +27,13 @@ pr:
 
 stages:
 
-  - stage: build
+  - stage: build_test_publish
     pool:
       vmImage: 'windows-latest'
     jobs:
-    - job: build
+    - job: build_test_publish
       steps:
+
       - task: AzurePowerShell@4
         displayName: Install dependant modules and build
         inputs:
@@ -46,46 +47,18 @@ stages:
             Invoke-Build
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
-      - publish: $(System.DefaultWorkingDirectory)\output
-        artifact: PSServiceBus
 
-  - stage: test 
-    pool:
-      vmImage: 'windows-latest'
-    condition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
-    jobs:
-    - job: test_windows
-      steps:
-      - task: DownloadPipelineArtifact@2
-        inputs:
-          source: current
-          artifactName: PSServiceBus
-          path: output
       - task: AzurePowerShell@4
         displayName: Run tests
         inputs:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: | 
-            Set-Location -Path $(Build.SourcesDirectory)
-            Install-Module -Name "InvokeBuild" -RequiredVersion 5.5.3 -Force
-            Install-Module -Name "Pester" -RequiredVersion 4.9.0 -Force
             Invoke-Build RunIntegrationTests
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
+        condition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
 
-  - stage: publish
-    pool:
-      vmImage: 'windows-latest'
-    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
-    jobs:
-    - job: publish
-      steps:
-      - task: DownloadPipelineArtifact@2
-        inputs:
-          source: current
-          artifactName: PSServiceBus
-          path: output
       - task: AzurePowerShell@4
         displayName: Bump version number
         inputs:
@@ -93,6 +66,8 @@ stages:
           ScriptType: 'InlineScript'
           Inline: |
             Invoke-Build UpdateVersion -NewVersionNumber ($(Major) + "." + $(Minor) + "." + $(Hotfix))
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+
       - task: CmdLine@2
         displayName: Commit changes back to github
         inputs:
@@ -103,10 +78,13 @@ stages:
             git add *
             git commit -m "[skip ci] azure pipeline bump version number"
             git push --repo "https://$(PersonalAccessToken)@github.com/tommagumma/PSServiceBus.git"
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+        
       - task: AzurePowerShell@4
         displayName: Publish to gallery
         inputs:
           azureSubscription: 'Azure'
           ScriptType: 'InlineScript'
           Inline: |
-            Invoke-Build PublishToGallery -PsGalleryKey $(PSGalleryKey)          
+            Invoke-Build PublishToGallery -PsGalleryKey $(PSGalleryKey)
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
