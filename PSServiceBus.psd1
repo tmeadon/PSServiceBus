@@ -80,7 +80,8 @@
         'Get-SbSubscription',
 
         'Send-SbMessage',
-
+        'Send-SbMessagesInBatch',
+        
         'Receive-SbMessage',
         'Receive-SbMessagesInBatch',
         

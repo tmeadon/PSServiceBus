@@ -4,6 +4,7 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Exceptions;
 using PSServiceBus.Enums;
+using System.Collections.Generic;
 
 namespace PSServiceBus.Helpers
 {
@@ -22,7 +23,7 @@ namespace PSServiceBus.Helpers
             else
             {
                 throw new NonExistentEntityException(String.Format("{0} {1} does not exist", EntityType, EntityPath));
-            }           
+            }
         }
 
         public void SendMessage(string MessageBody)
@@ -30,6 +31,45 @@ namespace PSServiceBus.Helpers
             byte[] body = Encoding.UTF8.GetBytes(MessageBody);
             Message message = new Message(body);
             messageSender.SendAsync(message);
+        }
+
+        public void SendMessagesInBatch(string[] Messages)
+        {
+            IList<Message> payload = null;
+
+            try
+            {
+                payload = new List<Message>();
+
+                for (int i = 0; i < Messages.Length; i++)
+                {
+                    byte[] body = Encoding.UTF8.GetBytes(Messages[i]);
+                    Message msg = new Message(body);
+                    payload.Add(msg);
+                }
+            }
+            catch (Exception E)
+            {
+                throw new Exception("Something went wrong parsing the messages.", E);
+            }
+
+            if (payload != null && payload.Count > 0)
+            {
+                try
+                {
+                    messageSender.SendAsync(payload);
+                }
+                catch (Exception E)
+                {
+
+                    throw new Exception("Something while sending the messages in batch to the Service Bus.", E);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Message collection was empty.");
+            }
+
         }
     }
 }
