@@ -165,6 +165,75 @@
             Main cmdlet method.
             </summary>
         </member>
+        <member name="T:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch">
+            <summary>
+            <para type="synopsis">Receivess messages in batch from an Azure Service Bus queue or subscription.</para>
+            <para type="description">This cmdlet retrieves messages in batch from an Azure Service Bus queue or subscription. Two receive modes are available:</para>
+            <para type="description">ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
+            <para type="description">received using the -ReceiveQty parameter, they will be returned individually to the pipeline. Messages can also be</para>
+            <para type="description">received from the dead letter queue by adding the -ReceiveFromDeadLetterQueue parameter.</para>
+            </summary>
+            <example>
+            <code>Receive-SbMessagesInBatch -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue'</code>
+            <para>Receives a single message in batch from the queue 'example-queue' and leaves it there</para>
+            <para></para>
+            </example>
+            <example>
+            <code>Receive-SbMessagesInBatch -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription' -ReceiveQty 5</code>
+            <para>Receives 5 messages in batch from the subscription called 'example-subscription' in the topic 'example-topic' and leaves them there</para>
+            <para></para>
+            </example>
+            <example>
+            <code>Receive-SbMessagesInBatch -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue' -ReceiveType ReceiveAndDelete</code>
+            <para>Receives a single message in batch from the queue 'example-queue' and removes it from the queue</para>
+            <para></para>
+            </example>
+            <example>
+            <code>Receive-SbMessagesInBatch -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue' -ReceiveFromDeadLetterQueue</code>
+            <para>Receives a single message in batch from the dead letter queue for queue 'example-queue' and leaves it there</para>
+            <para></para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.QueueName">
+            <summary>
+            <para type="description">The name of the queue to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.TopicName">
+            <summary>
+            <para type="description">The name of the topic containing the subscription to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.SubscriptionName">
+            <summary>
+            <para type="description">The name of the subscription to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.ReceiveQty">
+            <summary>
+            <para type="description">The number of messages to retrieve - defaults to 1.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.ReceiveType">
+            <summary>
+            <para type="description">Specifies the receive behaviour - defaults to ReceiveAndKeep.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.ReceiveFromDeadLetterQueue">
+            <summary>
+            <para type="description">Retrieves messages from the entity's dead letter queue.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.ReceiveSbMessagesInBatch.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Cmdlets.SendSbMessage">
             <summary>
             <para type="synopsis">Sends a message to an Azure Service Bus queue or topic.</para>
