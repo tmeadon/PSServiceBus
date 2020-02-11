@@ -360,6 +360,26 @@
             Main cmdlet method.
             </summary>
         </member>
+        <member name="T:PSServiceBus.Enums.SbBatchTestResults">
+            <summary>
+            Valid reasons for the message batch test to fail
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbBatchTestResults.BatchWithinLimits">
+            <summary>
+            No failure
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbBatchTestResults.BatchTooLarge">
+            <summary>
+            Batch is over the size limit
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbBatchTestResults.TooManyItems">
+            <summary>
+            Batch contains more than the allowed number of messages
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Enums.SbEntityTypes">
             <summary>
             Valid Service Bus entities
@@ -455,7 +475,7 @@
         </member>
         <member name="T:PSServiceBus.Outputs.SbMessageBatchTestResult">
             <summary>
-            Contains the id and the body for a service bus message
+            Contains the result of a message batch test
             </summary>
         </member>
         <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.BatchSize">
@@ -491,6 +511,11 @@
         <member name="F:PSServiceBus.Outputs.SbMessageBatchTestResult.ValidForCurrentNamespace">
             <summary>
             Whether or not the batch is within the contstraints of the in-scope namespace
+            </summary>
+        </member>
+        <member name="T:PSServiceBus.Outputs.SbMessageBatchTestResult.SkuValidityOutput">
+            <summary>
+            Sub-object for the sku validity members
             </summary>
         </member>
         <member name="T:PSServiceBus.Outputs.SbQueue">
