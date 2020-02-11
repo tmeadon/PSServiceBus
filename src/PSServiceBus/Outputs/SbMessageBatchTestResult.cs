@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Azure.ServiceBus.Management;
+using PSServiceBus.Enums;
 
 namespace PSServiceBus.Outputs
 {
     /// <summary>
-    /// Contains the id and the body for a service bus message
+    /// Contains the result of a message batch test
     /// </summary>
     public class SbMessageBatchTestResult
     {
@@ -22,17 +21,17 @@ namespace PSServiceBus.Outputs
         /// <summary>
         /// Whether or not the batch is within the constraints of the 'basic' Service Bus Namespace sku
         /// </summary>
-        public bool ValidForBasicSku;
+        public SkuValidityOutput ValidForBasicSku;
 
         /// <summary>
         /// Whether or not the batch is within the constraints of the 'basic' Service Bus Namespace sku
         /// </summary>
-        public bool ValidForStandardSku;
+        public SkuValidityOutput ValidForStandardSku;
 
         /// <summary>
         /// Whether or not the batch is within the constraints of the 'premium' Service Bus Namespace sku
         /// </summary>
-        public bool ValidForPremiumSku;
+        public SkuValidityOutput ValidForPremiumSku;
 
         /// <summary>
         /// Sku of the in-scope namespace
@@ -42,6 +41,16 @@ namespace PSServiceBus.Outputs
         /// <summary>
         /// Whether or not the batch is within the contstraints of the in-scope namespace
         /// </summary>
-        public bool? ValidForCurrentNamespace;
+        public SkuValidityOutput? ValidForCurrentNamespace;
+
+        /// <summary>
+        /// Sub-object for the sku validity members
+        /// </summary>
+        public struct SkuValidityOutput
+        {
+            public bool Result;
+
+            public SbBatchTestResults? Reason;
+        }
     }
 }

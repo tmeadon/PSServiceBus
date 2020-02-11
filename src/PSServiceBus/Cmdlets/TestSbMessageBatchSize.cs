@@ -4,6 +4,7 @@ using System.Management.Automation;
 using Microsoft.Azure.ServiceBus.Management;
 using PSServiceBus.Outputs;
 using PSServiceBus.Helpers;
+using PSServiceBus.Enums;
 using Microsoft.Azure.ServiceBus;
 
 namespace PSServiceBus.Cmdlets
@@ -94,10 +95,26 @@ namespace PSServiceBus.Cmdlets
             return batchSize;
         }
 
-        public bool TestMessageBatch(string[] Messages, MessagingSku NamespaceSku)
+        public SbMessageBatchTestResult.SkuValidityOutput TestMessageBatch(string[] Messages, MessagingSku NamespaceSku)
         {
-            return this.GetMessageBatchSize(Messages) < this.GetMessageMaxSizeInBytes(NamespaceSku) &&
-                Messages.Length < 100 ? true : false;
+            bool result = true;
+            SbBatchTestResults reason = SbBatchTestResults.BatchWithinLimits;
+
+            if (this.GetMessageBatchSize(Messages) > this.GetMessageMaxSizeInBytes(NamespaceSku))
+            {
+                result = false;
+                reason = SbBatchTestResults.BatchTooLarge;
+            }
+            else if (Messages.Length > 100)
+            {
+                result = false;
+                reason = SbBatchTestResults.TooManyItems;
+            }
+
+            return new SbMessageBatchTestResult.SkuValidityOutput{
+                Result = result,
+                Reason = reason
+            };
         }
     }
 }
