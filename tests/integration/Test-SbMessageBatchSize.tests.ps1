@@ -82,17 +82,6 @@ Describe "Test-SbMessageBatchSize tests" {
         }
     )
 
-    # define a quick helper function for getting batch sizes
-    function Get-BatchSize 
-    {
-        Param
-        (
-            [string[]] $batch
-        )
-
-        return [System.Text.Encoding]::UTF8.GetBytes($batch).Count
-    }
-
     Context "Test parameter attributes" {
 
         It "Messages parameter should be mandatory" {
