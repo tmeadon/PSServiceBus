@@ -24,23 +24,38 @@ Describe "Test-SbMessageBatchSize tests" {
     $batch_Lt100Msgs_Gt256Kb_Gt1Mb = @(1..30 | ForEach-Object -Process {$largeMessage})
     $batch_Gt100Msgs_Lt256Kb_Lt1Mb = @(1..110 | ForEach-Object -Process {$smallMessage})
 
+    # store details of the sku in use for tests
+    $currentSku = $ServiceBusUtils.GetNamespaceSku()
+
+    switch ($currentSku)
+    {
+        "Basic"     {$maxMessageSize = 256000}
+        "Standard"  {$maxMessageSize = 256000}
+        "Premium"   {$maxMessageSize = 1000000}
+        Default     {throw "Unable to get the max message size for $currentSku"}
+    }
+
     # create some test cases for the various Service Bus skus
     $basicSkuTests = @(
         @{
             batch = $batch_Lt100Msgs_Lt256Kb_Lt1Mb
             expectedResult = $true
+            expectedReason = "BatchWithinLimits"
         },
         @{
             batch = $batch_Lt100Msgs_Gt256Kb_Lt1Mb
             expectedResult = $false
+            expectedReason = "BatchTooLarge"
         },
         @{
             batch = $batch_Lt100Msgs_Gt256Kb_Gt1Mb
             expectedResult = $false
+            expectedReason = "BatchTooLarge"
         },
         @{
             batch = $batch_Gt100Msgs_Lt256Kb_Lt1Mb
             expectedResult = $false
+            expectedReason = "TooManyItems"
         }
     )
 
@@ -48,18 +63,22 @@ Describe "Test-SbMessageBatchSize tests" {
         @{
             batch = $batch_Lt100Msgs_Lt256Kb_Lt1Mb
             expectedResult = $true
+            expectedReason = "BatchWithinLimits"
         },
         @{
             batch = $batch_Lt100Msgs_Gt256Kb_Lt1Mb
             expectedResult = $false
+            expectedReason = "BatchTooLarge"
         },
         @{
             batch = $batch_Lt100Msgs_Gt256Kb_Gt1Mb
             expectedResult = $false
+            expectedReason = "BatchTooLarge"
         },
         @{
             batch = $batch_Gt100Msgs_Lt256Kb_Lt1Mb
             expectedResult = $false
+            expectedReason = "TooManyItems"
         }
     )
 
@@ -67,18 +86,22 @@ Describe "Test-SbMessageBatchSize tests" {
         @{
             batch = $batch_Lt100Msgs_Lt256Kb_Lt1Mb
             expectedResult = $true
+            expectedReason = "BatchWithinLimits"
         },
         @{
             batch = $batch_Lt100Msgs_Gt256Kb_Lt1Mb
             expectedResult = $true
+            expectedReason = "BatchWithinLimits"
         },
         @{
             batch = $batch_Lt100Msgs_Gt256Kb_Gt1Mb
             expectedResult = $false
+            expectedReason = "BatchTooLarge"
         },
         @{
             batch = $batch_Gt100Msgs_Lt256Kb_Lt1Mb
             expectedResult = $false
+            expectedReason = "TooManyItems"
         }
     )
 
@@ -100,19 +123,34 @@ Describe "Test-SbMessageBatchSize tests" {
             (Test-SbMessageBatchSize -Messages $batch_Lt100Msgs_Lt256Kb_Lt1Mb).NumberOfMessages | Should -Be $batch_Lt100Msgs_Lt256Kb_Lt1Mb.Count
         }
 
-        It "should return the correct value for 'ValidForBasicSku'" -TestCases $basicSkuTests {
+        It "should return the correct result value for 'ValidForBasicSku'" -TestCases $basicSkuTests {
             param ([string[]] $batch, [bool] $expectedResult)
-            (Test-SbMessageBatchSize -Messages $batch).ValidForBasicSku | Should -Be $expectedResult
+            (Test-SbMessageBatchSize -Messages $batch).ValidForBasicSku.Result | Should -Be $expectedResult
         }
 
-        It "should return the correct value for 'ValidForStandardSku'" -TestCases $standardSkuTests {
-            param ([string[]] $batch, [bool] $expectedResult)
-            (Test-SbMessageBatchSize -Messages $batch).ValidForStandardSku | Should -Be $expectedResult
+        It "should return the correct reason value for 'ValidForBasicSku'" -TestCases $basicSkuTests {
+            param ([string[]] $batch, [string] $expectedReason)
+            (Test-SbMessageBatchSize -Messages $batch).ValidForBasicSku.Reason | Should -Be $expectedReason
         }
 
-        It "should return the correct value for 'ValidForPremiumSku'" -TestCases $premiumSkuTests {
+        It "should return the correct result value for 'ValidForStandardSku'" -TestCases $standardSkuTests {
             param ([string[]] $batch, [bool] $expectedResult)
-            (Test-SbMessageBatchSize -Messages $batch).ValidForPremiumSku | Should -Be $expectedResult
+            (Test-SbMessageBatchSize -Messages $batch).ValidForStandardSku.Result | Should -Be $expectedResult
+        }
+
+        It "should return the correct reason value for 'ValidForStandardSku'" -TestCases $standardSkuTests {
+            param ([string[]] $batch, [string] $expectedReason)
+            (Test-SbMessageBatchSize -Messages $batch).ValidForStandardSku.Reason | Should -Be $expectedReason
+        }
+
+        It "should return the correct result value for 'ValidForPremiumSku'" -TestCases $premiumSkuTests {
+            param ([string[]] $batch, [bool] $expectedResult)
+            (Test-SbMessageBatchSize -Messages $batch).ValidForPremiumSku.Result | Should -Be $expectedResult
+        }
+
+        It "should return the correct reason value for 'ValidForPremiumSku'" -TestCases $premiumSkuTests {
+            param ([string[]] $batch, [string] $expectedReason)
+            (Test-SbMessageBatchSize -Messages $batch).ValidForPremiumSku.Reason | Should -Be $expectedReason
         }
 
         It "should return null for 'CurrentNamespaceSku'" {
@@ -134,47 +172,46 @@ Describe "Test-SbMessageBatchSize tests" {
             (Test-SbMessageBatchSize -Messages $batch_Lt100Msgs_Lt256Kb_Lt1Mb -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).NumberOfMessages | Should -Be $batch_Lt100Msgs_Lt256Kb_Lt1Mb.Count
         }
 
-        It "should return the correct value for 'ValidForBasicSku'" -TestCases $basicSkuTests {
+        It "should return the correct result value for 'ValidForBasicSku'" -TestCases $basicSkuTests {
             param ([string[]] $batch, [bool] $expectedResult)
-            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForBasicSku | Should -Be $expectedResult
+            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForBasicSku.Result | Should -Be $expectedResult
         }
 
-        It "should return the correct value for 'ValidForStandardSku'" -TestCases $standardSkuTests {
-            param ([string[]] $batch, [bool] $expectedResult)
-            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForStandardSku | Should -Be $expectedResult
+        It "should return the correct reason value for 'ValidForBasicSku'" -TestCases $basicSkuTests {
+            param ([string[]] $batch, [string] $expectedReason)
+            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForBasicSku.Reason | Should -Be $expectedReason
         }
 
-        It "should return the correct value for 'ValidForPremiumSku'" -TestCases $premiumSkuTests {
+        It "should return the correct result value for 'ValidForStandardSku'" -TestCases $standardSkuTests {
             param ([string[]] $batch, [bool] $expectedResult)
-            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForPremiumSku | Should -Be $expectedResult
+            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForStandardSku.Result | Should -Be $expectedResult
+        }
+
+        It "should return the correct reason value for 'ValidForStandardSku'" -TestCases $standardSkuTests {
+            param ([string[]] $batch, [string] $expectedReason)
+            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForStandardSku.Reason | Should -Be $expectedReason
+        }
+
+        It "should return the correct result value for 'ValidForPremiumSku'" -TestCases $premiumSkuTests {
+            param ([string[]] $batch, [bool] $expectedResult)
+            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForPremiumSku.Result | Should -Be $expectedResult
+        }
+
+        It "should return the correct reason value for 'ValidForPremiumSku'" -TestCases $premiumSkuTests {
+            param ([string[]] $batch, [string] $expectedReason)
+            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForPremiumSku.Reason | Should -Be $expectedReason
         }
 
         It "should return the correct value for 'CurrentNamespaceSku'" {
             (Test-SbMessageBatchSize -Messages $batch_Lt100Msgs_Lt256Kb_Lt1Mb -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).CurrentNamespaceSku | Should -Be $ServiceBusUtils.GetNamespaceSku()
         }
 
-        It "should return the correct value for 'ValidForCurrentNamespace'" {
+        It "should return the correct result value for 'ValidForCurrentNamespace'" {
+            (Test-SbMessageBatchSize -Messages $batch_Lt100Msgs_Lt256Kb_Lt1Mb -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForCurrentNamespace.Result | Should -Be $true
+        }
 
-            $currentSku = $ServiceBusUtils.GetNamespaceSku()
-
-            switch ($currentSku)
-            {
-                "Basic"     {$maxMessageSize = 256000}
-                "Standard"  {$maxMessageSize = 256000}
-                "Premium"   {$maxMessageSize = 1000000}
-                Default     {throw "Unable to get the max message size for $currentSku"}
-            }
-
-            $batch = $batch_Lt100Msgs_Gt256Kb_Lt1Mb
-
-            $expectedResult = $true
-
-            if ($ServiceBusUtils.GetMessageBatchSize($batch) -gt $maxMessageSize)
-            {
-                $expectedResult = $false
-            }
-
-            (Test-SbMessageBatchSize -Messages $batch -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForCurrentNamespace | Should -Be $expectedResult
+        It "should return the correct reason value for 'ValidForCurrentNamespace'" {
+            (Test-SbMessageBatchSize -Messages $batch_Lt100Msgs_Lt256Kb_Lt1Mb -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString).ValidForCurrentNamespace.Reason | Should -Be "BatchWithinLimits"
         }
     }
 }
