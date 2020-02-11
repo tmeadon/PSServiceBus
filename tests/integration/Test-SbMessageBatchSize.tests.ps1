@@ -115,6 +115,9 @@ Describe "Test-SbMessageBatchSize tests" {
 
     Context "Test without -NamespaceConnectionString parameter" {
 
+        # ensure default parameter value is not set
+        $Global:PSDefaultParameterValues["Test-SbMessageBatchSize`:NamespaceConnectionString"] = $null
+
         It "should return the correct batch size" {
             (Test-SbMessageBatchSize -Messages $batch_Lt100Msgs_Lt256Kb_Lt1Mb).BatchSize | Should -Be ("{0}B" -f ($ServiceBusUtils.GetMessageBatchSize($batch_Lt100Msgs_Lt256Kb_Lt1Mb)))
         }
