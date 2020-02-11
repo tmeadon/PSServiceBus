@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Configuration>
+	<ViewDefinitions>
+		<View>
+			<Name>PSServiceBus.Outputs.SbMessage</Name>
+			<ViewSelectedBy>
+				<TypeName>PSServiceBus.Outputs.SbMessage</TypeName>
+			</ViewSelectedBy>
+			<ListControl>
+				<ListEntries>
+					<ListEntry>
+						<ListItems>
+							<ListItem>
+								<PropertyName>MessageId</PropertyName>
+							</ListItem>
+							<ListItem>
+								<PropertyName>UserProperties</PropertyName>
+							</ListItem>
+							<ListItem>
+								<PropertyName>SystemProperties</PropertyName>
+							</ListItem>
+							<ListItem>
+								<PropertyName>MessageBody</PropertyName>
+							</ListItem>
+						</ListItems>
+					</ListEntry>
+				</ListEntries>
+			</ListControl>
+		</View>
+	</ViewDefinitions>
+</Configuration>
