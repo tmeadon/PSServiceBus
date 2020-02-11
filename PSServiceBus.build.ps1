@@ -61,6 +61,7 @@ task CopyFiles {
     Copy-Item -Path "$BuildRoot\PSServiceBus.ps*" -Destination "$BuildRoot\output\PSServiceBus"
     Copy-Item -Path "$BuildRoot\src\PSServiceBus\bin\Release\netstandard2.0" -Destination "$BuildRoot\output\PSServiceBus\bin" -Recurse
     Copy-Item -Path "$BuildRoot\functions" -Destination "$BuildRoot\output\PSServiceBus\functions" -Recurse
+    Copy-Item -Path "$BuildRoot\formats" -Destination "$BuildRoot\output\PSServiceBus\formats" -Recurse
 }
 
 task CleanIntegrationTests {
