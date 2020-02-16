@@ -81,6 +81,7 @@ namespace PSServiceBus.Cmdlets
             }
 
             sbReceiver.PurgeMessages();
+            sbReceiver.Dispose();
         }
     }
 }

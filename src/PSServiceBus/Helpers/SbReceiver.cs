@@ -7,16 +7,20 @@ using PSServiceBus.Outputs;
 using PSServiceBus.Enums;
 using PSServiceBus.Exceptions;
 using System.Linq;
+using System.Threading;
 
 namespace PSServiceBus.Helpers
 {
     /// <summary></summary>
-    public class SbReceiver
+    public class SbReceiver: IDisposable
     {
         private readonly MessageReceiver messageReceiver;
+        private readonly CancellationTokenSource tokenCancel;
 
         public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager, bool PurgeMode = false)
         {
+            tokenCancel = new CancellationTokenSource();
+
             ReceiveMode receiveMode = ReceiveMode.PeekLock;
 
             if(PurgeMode)
@@ -43,6 +47,8 @@ namespace PSServiceBus.Helpers
 
         public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager, bool PurgeMode = false)
         {
+            tokenCancel = new CancellationTokenSource();
+
             ReceiveMode receiveMode = ReceiveMode.PeekLock;
 
             if (PurgeMode)
@@ -167,13 +173,27 @@ namespace PSServiceBus.Helpers
 
                 do
                 {
-                    res = messageReceiver.ReceiveAsync(100,TimeSpan.FromSeconds(1)).Result;
+                    //Did we invoke the dispose of this receiver?
+                    if (tokenCancel.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    //Is the messageReceiver in a closing state?
+                    if (messageReceiver.IsClosedOrClosing)
+                    {
+                        break;
+                    }
+
+                    var temp = messageReceiver.ReceiveAsync(100, TimeSpan.FromSeconds(1));
+                    temp.Wait();
+                    res = temp.Result;
+
                 } while (res != null && res.Count > 0);
             }
-            catch (Exception)
+            catch (Exception E)
             {
-
-                throw;
+                throw E;
             }
         }
         
@@ -203,6 +223,13 @@ namespace PSServiceBus.Helpers
         {
             MessageReceiver messageReceiver = new MessageReceiver(NamespaceConnectionString, EntityPath, Mode);
             messageReceiver.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
+
+            //ReceiveAndDelete indicates that we are running the Purge mode
+            if (Mode == ReceiveMode.ReceiveAndDelete)
+            {
+                messageReceiver.PrefetchCount = 100;
+            }
+
             return messageReceiver;
         }
 
@@ -245,5 +272,43 @@ namespace PSServiceBus.Helpers
 
             return res;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    tokenCancel.Cancel();
+                    // TODO: dispose managed state (managed objects).
+                    messageReceiver.CloseAsync();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~SbReceiver()
+        // {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
