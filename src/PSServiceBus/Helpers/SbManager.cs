@@ -130,22 +130,9 @@ namespace PSServiceBus.Helpers
             return EntityNameHelper.FormatDeadLetterPath(EntityPath);
         }
 
-        public int GetMessageMaxSizeInBytes()
+        public MessagingSku GetNamespaceSku()
         {
-            MessagingSku sku = this.managementClient.GetNamespaceInfoAsync().Result.MessagingSku;
-
-            switch (sku)
-            {
-                case MessagingSku.Basic:
-                case MessagingSku.Standard:
-                    return 256000;
-                
-                case MessagingSku.Premium:
-                    return 1000000;
-
-                default:
-                    throw new NotImplementedException(string.Format("Maximum message size for sku '{0}' is unknown", sku.ToString()));
-            }
+            return this.managementClient.GetNamespaceInfoAsync().Result.MessagingSku;
         }
     }
 }

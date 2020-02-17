@@ -5,6 +5,7 @@ using Microsoft.Azure.ServiceBus.Core;
 using PSServiceBus.Exceptions;
 using PSServiceBus.Enums;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PSServiceBus.Helpers
 {
@@ -57,11 +58,11 @@ namespace PSServiceBus.Helpers
             {
                 try
                 {
-                    messageSender.SendAsync(payload);
+                    var sendTask = messageSender.SendAsync(payload);
+                    sendTask.Wait();
                 }
                 catch (Exception E)
                 {
-
                     throw new Exception("Something while sending the messages in batch to the Service Bus.", E);
                 }
             }
@@ -69,7 +70,6 @@ namespace PSServiceBus.Helpers
             {
                 throw new InvalidOperationException("Message collection was empty.");
             }
-
         }
     }
 }
