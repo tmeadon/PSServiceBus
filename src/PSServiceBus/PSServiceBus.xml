@@ -4,6 +4,53 @@
         <name>PSServiceBus</name>
     </assembly>
     <members>
+        <member name="T:PSServiceBus.Cmdlets.ClearSbQueue">
+            <summary>
+            <para type="synopsis">Clears all messages from an Azure Service Bus queue or subscription.</para>
+            <para type="description">This cmdlet clears all messages from an Azure Service Bus queue or subscription.</para>
+            <para type="description">The messages will be destroyed and not outputted to the console.</para>
+            </summary>
+            <example>
+            <code>Clear-SbQueue -NamespaceConnectionString $namespaceConnectionString -QueueName 'example-queue'</code>
+            <para>Clears all messages from the queue 'example-queue'</para>
+            <para></para>
+            </example>
+            <example>
+            <code>Clear-SbQueue -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription'</code>
+            <para>Clears all messages from the subscription called 'example-subscription' in the topic 'example-topic'</para>
+            <para></para>
+            </example>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.NamespaceConnectionString">
+            <summary>
+            <para type="description">A connection string with 'Manage' rights for the Azure Service Bus Namespace.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.QueueName">
+            <summary>
+            <para type="description">The name of the queue to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.TopicName">
+            <summary>
+            <para type="description">The name of the topic containing the subscription to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.SubscriptionName">
+            <summary>
+            <para type="description">The name of the subscription to retrieve messages from.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.DeadLetterQueue">
+            <summary>
+            <para type="description">Retrieves messages from the entity's dead letter queue.</para>
+            </summary>
+        </member>
+        <member name="M:PSServiceBus.Cmdlets.ClearSbQueue.ProcessRecord">
+            <summary>
+            Main cmdlet method.
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Cmdlets.GetSbQueue">
             <summary>
             <para type="synopsis">Gets a queue by name or a list of all queues from an Azure Service Bus Namespace.  Returns the number of messages in the active and dead letter queues.</para>
