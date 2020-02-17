@@ -172,5 +172,24 @@ namespace PSServiceBus.Tests.Utils
             Message message = new Message(body);
             messageSender.SendAsync(message);
         }
+
+        public long GetMessageBatchSize(string[] Messages)
+        {
+            long batchSize = 0;
+
+            for (int i = 0; i < Messages.Length; i++)
+            {
+                byte[] body = Encoding.UTF8.GetBytes(Messages[i]);
+                Message message = new Message(body);
+                batchSize += message.Size;
+            }
+            
+            return batchSize;
+        }
+
+        public string GetNamespaceSku()
+        {
+            return this.managementClient.GetNamespaceInfoAsync().Result.MessagingSku.ToString();
+        }
     }
 }

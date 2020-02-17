@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Configuration>
+	<ViewDefinitions>
+		<View>
+			<Name>PSServiceBus.Outputs.SbMessageBatchTestResult</Name>
+			<ViewSelectedBy>
+				<TypeName>PSServiceBus.Outputs.SbMessageBatchTestResult</TypeName>
+			</ViewSelectedBy>
+			<ListControl>
+				<ListEntries>
+					<ListEntry>
+						<ListItems>
+							<ListItem>
+								<PropertyName>BatchSize</PropertyName>
+							</ListItem>
+							<ListItem>
+								<PropertyName>NumberOfMessages</PropertyName>
+							</ListItem>
+							<ListItem>
+								<Label>ValidForBasicSku</Label>
+								<ScriptBlock>"Result = " + $_.ValidForBasicSku.Result + "; Reason = " + $_.ValidForBasicSku.Reason.ToString()</ScriptBlock>
+							</ListItem>
+							<ListItem>
+								<Label>ValidForStandardSku</Label>
+								<ScriptBlock>"Result = " + $_.ValidForStandardSku.Result + "; Reason = " + $_.ValidForStandardSku.Reason.ToString()</ScriptBlock>
+							</ListItem>
+							<ListItem>
+								<Label>ValidForPremiumSku</Label>
+								<ScriptBlock>"Result = " + $_.ValidForPremiumSku.Result + "; Reason = " + $_.ValidForPremiumSku.Reason.ToString()</ScriptBlock>
+							</ListItem>
+							<ListItem>
+								<PropertyName>CurrentNamespaceSku</PropertyName>
+							</ListItem>
+							<ListItem>
+								<Label>ValidForCurrentNamespace</Label>
+								<ScriptBlock>"Result = " + $_.ValidForCurrentNamespace.Result + "; Reason = " + $_.ValidForCurrentNamespace.Reason.ToString()</ScriptBlock>
+							</ListItem>
+						</ListItems>
+					</ListEntry>
+				</ListEntries>
+			</ListControl>
+		</View>
+	</ViewDefinitions>
+</Configuration>
