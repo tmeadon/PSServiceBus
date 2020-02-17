@@ -375,11 +375,6 @@
             Batch is over the size limit
             </summary>
         </member>
-        <member name="F:PSServiceBus.Enums.SbBatchTestResults.TooManyItems">
-            <summary>
-            Batch contains more than the allowed number of messages
-            </summary>
-        </member>
         <member name="T:PSServiceBus.Enums.SbEntityTypes">
             <summary>
             Valid Service Bus entities

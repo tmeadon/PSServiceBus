@@ -105,11 +105,6 @@ namespace PSServiceBus.Cmdlets
                 result = false;
                 reason = SbBatchTestResults.BatchTooLarge;
             }
-            else if (Messages.Length > 100)
-            {
-                result = false;
-                reason = SbBatchTestResults.TooManyItems;
-            }
 
             return new SbMessageBatchTestResult.SkuValidityOutput{
                 Result = result,

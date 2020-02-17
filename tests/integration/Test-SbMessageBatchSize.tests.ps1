@@ -22,7 +22,6 @@ Describe "Test-SbMessageBatchSize tests" {
     $batch_Lt100Msgs_Lt256Kb_Lt1Mb = @(1..20 | ForEach-Object -Process {$smallMessage})
     $batch_Lt100Msgs_Gt256Kb_Lt1Mb = @(1..10 | ForEach-Object -Process {$largeMessage})
     $batch_Lt100Msgs_Gt256Kb_Gt1Mb = @(1..30 | ForEach-Object -Process {$largeMessage})
-    $batch_Gt100Msgs_Lt256Kb_Lt1Mb = @(1..110 | ForEach-Object -Process {$smallMessage})
 
     # store details of the sku in use for tests
     $currentSku = $ServiceBusUtils.GetNamespaceSku()
@@ -51,11 +50,6 @@ Describe "Test-SbMessageBatchSize tests" {
             batch = $batch_Lt100Msgs_Gt256Kb_Gt1Mb
             expectedResult = $false
             expectedReason = "BatchTooLarge"
-        },
-        @{
-            batch = $batch_Gt100Msgs_Lt256Kb_Lt1Mb
-            expectedResult = $false
-            expectedReason = "TooManyItems"
         }
     )
 
@@ -74,11 +68,6 @@ Describe "Test-SbMessageBatchSize tests" {
             batch = $batch_Lt100Msgs_Gt256Kb_Gt1Mb
             expectedResult = $false
             expectedReason = "BatchTooLarge"
-        },
-        @{
-            batch = $batch_Gt100Msgs_Lt256Kb_Lt1Mb
-            expectedResult = $false
-            expectedReason = "TooManyItems"
         }
     )
 
@@ -97,11 +86,6 @@ Describe "Test-SbMessageBatchSize tests" {
             batch = $batch_Lt100Msgs_Gt256Kb_Gt1Mb
             expectedResult = $false
             expectedReason = "BatchTooLarge"
-        },
-        @{
-            batch = $batch_Gt100Msgs_Lt256Kb_Lt1Mb
-            expectedResult = $false
-            expectedReason = "TooManyItems"
         }
     )
 

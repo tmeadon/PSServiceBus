@@ -13,11 +13,6 @@ namespace PSServiceBus.Enums
         /// <summary>
         /// Batch is over the size limit
         /// </summary>
-        BatchTooLarge,
-
-        /// <summary>
-        /// Batch contains more than the allowed number of messages
-        /// </summary>
-        TooManyItems
+        BatchTooLarge
     }
 }
