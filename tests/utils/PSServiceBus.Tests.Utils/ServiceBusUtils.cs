@@ -173,6 +173,23 @@ namespace PSServiceBus.Tests.Utils
             messageSender.SendAsync(message);
         }
 
+        public void SendMessagesInBatch(string entityName, string[] messages)
+        {
+            MessageSender messageSender = new MessageSender(this.NamespaceConnectionString, entityName);
+            messageSender.ServiceBusConnection.TransportType = TransportType.AmqpWebSockets;
+
+            IList<Message> messagesToSend = new List<Message>();
+
+            foreach (var messageBody in messages)
+            {
+                byte[] body = Encoding.UTF8.GetBytes(messageBody);
+                messagesToSend.Add(new Message(body));
+            }
+
+            var temp = messageSender.SendAsync(messagesToSend);
+            temp.Wait();
+        }
+
         public long GetMessageBatchSize(string[] Messages)
         {
             long batchSize = 0;
