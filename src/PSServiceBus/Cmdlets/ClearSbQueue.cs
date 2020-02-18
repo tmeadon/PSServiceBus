@@ -58,6 +58,18 @@ namespace PSServiceBus.Cmdlets
         public string SubscriptionName { get; set; }
 
         /// <summary>
+        /// <para type="description">The number of messages to retrieve - defaults to 1.</para>
+        /// </summary>
+        [Parameter]
+        public int ReceiveBatchQty { get; set; } = 100;
+
+        /// <summary>
+        /// <para type="description">The number of messages to retrieve - defaults to 1.</para>
+        /// </summary>
+        [Parameter]
+        public int PrefetchQty { get; set; } = 100;
+
+        /// <summary>
         /// <para type="description">Retrieves messages from the entity's dead letter queue.</para>
         /// </summary>
         [Parameter]
@@ -73,14 +85,14 @@ namespace PSServiceBus.Cmdlets
 
             if (this.ParameterSetName == "ClearQueue")
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, DeadLetterQueue, sbManager, true);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, DeadLetterQueue, sbManager, ReceiveBatchQty, PrefetchQty, true);
             }
             else
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, DeadLetterQueue, sbManager, true);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, DeadLetterQueue, sbManager, ReceiveBatchQty, PrefetchQty, true);
             }
-
-            sbReceiver.PurgeMessages();
+            
+            sbReceiver.PurgeMessages(this);
             sbReceiver.Dispose();
         }
     }

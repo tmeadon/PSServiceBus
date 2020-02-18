@@ -41,6 +41,16 @@
             <para type="description">The name of the subscription to retrieve messages from.</para>
             </summary>
         </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.ReceiveBatchQty">
+            <summary>
+            <para type="description">The number of messages to retrieve - defaults to 1.</para>
+            </summary>
+        </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.PrefetchQty">
+            <summary>
+            <para type="description">The number of messages to retrieve - defaults to 1.</para>
+            </summary>
+        </member>
         <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.DeadLetterQueue">
             <summary>
             <para type="description">Retrieves messages from the entity's dead letter queue.</para>

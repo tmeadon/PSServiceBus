@@ -13,7 +13,7 @@ Describe "Clear-SbQueue tests" {
 
     $queues = $ServiceBusUtils.CreateQueues(2)
 
-    $queuesBatch = $ServiceBusUtils.CreateQueues(1)
+    $queuesBatch = $ServiceBusUtils.CreateQueues(2)
 
     $testTopic = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopic)
@@ -24,7 +24,10 @@ Describe "Clear-SbQueue tests" {
 
     $messagesToSendToEachEntity = 5
     $messagesToDeadLetter = 2
+    
     $messagesToSendInBatch = 200
+    $batchReceiveQty = 5
+    $batchPrefetchQty = 5
 
     foreach ($queue in $queues) {
         for ($i = 0; $i -lt $messagesToSendToEachEntity; $i++) {
@@ -49,12 +52,12 @@ Describe "Clear-SbQueue tests" {
     }
 
     $batchMessages = [System.Collections.Generic.List[string]]@()
+    
+    for ($i = 0; $i -lt $messagesToSendInBatch; $i++) {
+        $batchMessages.Add(([System.Guid]::NewGuid()).Guid)
+    }
 
     foreach ($queue in $queuesBatch) {
-        for ($i = 0; $i -lt $messagesToSendInBatch; $i++) {
-            $batchMessages.Add(([System.Guid]::NewGuid()).Guid)
-        }
-
         $ServiceBusUtils.SendMessagesInBatch($queue, $batchMessages.ToArray())
     }
 
@@ -79,25 +82,32 @@ Describe "Clear-SbQueue tests" {
 
         It "should clear all messages" {
             $queue = $queues[0]
-            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -Verbose:$false
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be 0
         }
 
         It "should clear all messages from the dead letter queue if -DeadLetterQueue is supplied" {
             $queue = $queues[1]
-            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -DeadLetterQueue
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -DeadLetterQueue -Verbose:$false
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.DeadLetterMessageCount | Should -Be 0
         }
 
         It "should close the receiver connection after purge, pumping new messages in the queue, should all be kept" {
             $queue = $queuesBatch[0]
-            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -Verbose:$false
             Start-Sleep -Seconds 1
             $ServiceBusUtils.SendMessagesInBatch($queue, $batchMessages.ToArray())
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be $messagesToSendInBatch
+        }
+
+        It "should fetch batches of $batchReceiveQty or less if -ReceiveBatchQty $batchReceiveQty is supplied" {
+            $queue = $queuesBatch[1]
+            $temp = @(Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -ReceiveBatchQty $batchReceiveQty -PrefetchQty $batchPrefetchQty -Verbose 4>&1)
+            $counters = @($temp.Message | ForEach-Object {[int]$_.Replace("Received Message Count: ", "")})
+            $counters -gt $batchReceiveQty | Should -BeNullOrEmpty
         }
     }
 
@@ -105,14 +115,14 @@ Describe "Clear-SbQueue tests" {
 
         It "should clear all messages" {
             $subscription = $subscriptions[0]
-            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -Verbose:$false
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $subscription).MessageCountDetails.ActiveMessageCount | Should -Be 0
         }
 
         It "should clear all messages from the dead letter queue if -DeadLetterQueue is supplied" {
             $subscription = $subscriptions[1]
-            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -DeadLetterQueue
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -DeadLetterQueue -Verbose:$false
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $subscription).MessageCountDetails.DeadLetterMessageCount | Should -Be 0
         }
