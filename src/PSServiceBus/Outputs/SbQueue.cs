@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Azure.ServiceBus.Management;
 
 namespace PSServiceBus.Outputs
 {
