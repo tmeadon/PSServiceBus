@@ -160,91 +160,80 @@ Describe "Get-SbQueue tests" {
         $testCases = @(
             @{
                 queueName = $newQueues[0]
+                result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $newQueues[0]
                 Properties = $ServiceBusUtils.GetQueue($newQueues[0])
                 QueueRuntimeInfo = $ServiceBusUtils.GetQueueRuntimeInfo($newQueues[0])
             },
             @{
                 queueName = $newQueues[1]
+                result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $newQueues[1]
                 Properties = $ServiceBusUtils.GetQueue($newQueues[1])
                 QueueRuntimeInfo = $ServiceBusUtils.GetQueueRuntimeInfo($newQueues[1])
             }
         )
 
         It "should return the correct queue" -TestCases $testCases {
-            param ([string] $queueName)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result)
             $result.Name | Should -Be $queueName
         }
 
         It "should return the correct number of active messages in a specific queue" -TestCases $testCases {
-            param ([string] $queueName)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result)
             $result.ActiveMessages | Should -EQ ($messagesToSendToEachQueue - $messagesToDeadLetter)
         }
 
         It "should return the correct number of dead lettered messages in a specific queue" -TestCases $testCases {
-            param ([string] $queueName)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result)
             $result.DeadLetteredMessages | Should -EQ $messagesToDeadLetter
         }
 
         It "should return the correct number of scheduled messages in a specific queue" -TestCases $testCases {
-            param ([string] $queueName)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result)
             $result.ScheduledMessageCount | Should -EQ $messagesToScheduleToEachEntity
         }
 
         It "should return the correct value for DefaultMessageTtlInDays" -TestCases $testCases {
-            param ([string] $queueName, [object] $properties)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $properties)
             $result.DefaultMessageTtlInDays | Should -EQ $properties.DefaultMessageTimeToLive
         }
 
         It "should return the correct value for LockDuration" -TestCases $testCases {
-            param ([string] $queueName, [object] $properties)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $properties)
             $result.LockDuration | Should -EQ $properties.LockDuration
         }
 
         It "should return the correct value for DuplicateDetectionHistoryTimeWindow" -TestCases $testCases {
-            param ([string] $queueName, [object] $properties)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $properties)
             $result.DuplicateDetectionHistoryTimeWindow | Should -EQ $properties.DuplicateDetectionHistoryTimeWindow
         }
 
         It "should return the correct value for MaxDeliveryCount" -TestCases $testCases {
-            param ([string] $queueName, [object] $properties)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $properties)
             $result.MaxDeliveryCount | Should -EQ $properties.MaxDeliveryCount
         }
 
         It "should return the correct value for EnableBatchedOperations" -TestCases $testCases {
-            param ([string] $queueName, [object] $properties)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $properties)
             $result.EnableBatchedOperations | Should -EQ $properties.EnableBatchedOperations
         }
         
         It "should return the correct value for MaxSizeInMB" -TestCases $testCases {
-            param ([string] $queueName, [object] $properties)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $properties)
             $result.MaxSizeInMB | Should -EQ $properties.MaxSizeInMB
         }
 
         It "should return the correct value for CurrentSizeInMB" -TestCases $testCases {
-            param ([string] $queueName, [object] $queueRuntimeInfo)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $queueRuntimeInfo)
             $result.CurrentSizeInMB | Should -EQ ([int]($queueRuntimeInfo.QueueRuntimeInfo.SizeInBytes / 1000000))
         }
 
         It "should return the correct value for Status" -TestCases $testCases {
-            param ([string] $queueName, [object] $properties)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $properties)
             $result.Status | Should -EQ $properties.Status.ToString()
         }
 
         It "should return the correct value for PercentageCapacityFree" -TestCases $testCases {
-            param ([string] $queueName, [object] $queueRuntimeInfo)
-            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queueName
+            param ([string] $queueName, [object] $result, [object] $queueRuntimeInfo)
             $result.PercentageCapacityFree | Should -EQ ((($result.MaxSizeInMB - $result.CurrentSizeInMB) / $result.MaxSizeInMB) * 100)
         }
     }
