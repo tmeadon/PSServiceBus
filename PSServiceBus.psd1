@@ -66,7 +66,8 @@ PowerShellVersion = '5.1'
 FormatsToProcess = 
                'formats\PSServiceBus.Outputs.SbMessageBatchTestResult.format.ps1xml', 
                'formats\PSServiceBus.Outputs.SbMessage.format.ps1xml',
-               'formats\PSServiceBus.Outputs.SbQueue.format.ps1xml'
+               'formats\PSServiceBus.Outputs.SbQueue.format.ps1xml',
+               'formats\PSServiceBus.Outputs.SbSubscription.format.ps1xml'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @('bin\PSServiceBus.dll')
