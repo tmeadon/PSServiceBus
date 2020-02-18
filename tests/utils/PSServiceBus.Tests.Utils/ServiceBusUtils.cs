@@ -154,6 +154,11 @@ namespace PSServiceBus.Tests.Utils
             return this.managementClient.GetQueueRuntimeInfoAsync(queueName).Result;
         }
 
+        public QueueDescription GetQueue(string queueName)
+        {
+            return this.managementClient.GetQueueAsync(queueName).Result;
+        }
+
         public SubscriptionRuntimeInfo GetSubscriptionRuntimeInfo(string topicName, string subscriptionName)
         {
             return this.managementClient.GetSubscriptionRuntimeInfoAsync(topicName, subscriptionName).Result;
