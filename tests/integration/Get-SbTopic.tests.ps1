@@ -38,6 +38,9 @@ Describe "Get-SbTopic tests" {
         }
     }
 
+    # allow time for scheduled messages to send
+    Start-Sleep -Seconds 5
+
     # tests
 
     Context "Output type tests" {

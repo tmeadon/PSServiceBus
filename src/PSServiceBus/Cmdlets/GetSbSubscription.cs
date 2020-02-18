@@ -79,7 +79,12 @@ namespace PSServiceBus.Cmdlets
                     Name = subscription.SubscriptionName,
                     Topic = subscription.TopicPath,
                     ActiveMessages = subscriptionRuntimeInfo.MessageCountDetails.ActiveMessageCount,
-                    DeadLetteredMessages = subscriptionRuntimeInfo.MessageCountDetails.DeadLetterMessageCount
+                    DeadLetteredMessages = subscriptionRuntimeInfo.MessageCountDetails.DeadLetterMessageCount,
+                    DefaultMessageTtlInDays = subscription.DefaultMessageTimeToLive,
+                    LockDuration = subscription.LockDuration,
+                    MaxDeliveryCount = subscription.MaxDeliveryCount,
+                    EnableBatchedOperations = subscription.EnableBatchedOperations,
+                    Status = subscription.Status.ToString()
                 });
             }
 
