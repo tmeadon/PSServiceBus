@@ -21,7 +21,9 @@ trigger:
       - README.md
 
 pr:
-- master
+  branches:
+    include:
+      - master
 
 stages:
 
@@ -99,4 +101,3 @@ stages:
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
         condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
-        
