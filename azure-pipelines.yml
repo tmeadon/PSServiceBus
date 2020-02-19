@@ -10,7 +10,7 @@ variables:
     value: 0
   - name: Build
     value: $[counter('',0)]
-
+ 
 trigger:
   paths:
     exclude:
