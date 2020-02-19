@@ -13,6 +13,8 @@ Describe "Clear-SbQueue tests" {
 
     $queues = $ServiceBusUtils.CreateQueues(4)
 
+    $queuesBatch = $ServiceBusUtils.CreateQueues(1)
+
     $testTopic = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopic)
 
@@ -22,33 +24,38 @@ Describe "Clear-SbQueue tests" {
 
     $messagesToSendToEachEntity = 5
     $messagesToDeadLetter = 2
+    $messagesToSendInBatch = 200
 
-    foreach ($queue in $queues)
-    {
-        for ($i = 0; $i -lt $messagesToSendToEachEntity; $i++)
-        {
+    foreach ($queue in $queues) {
+        for ($i = 0; $i -lt $messagesToSendToEachEntity; $i++) {
             $ServiceBusUtils.SendTestMessage($queue)
         }
 
-        for ($i = 0; $i -lt $messagesToDeadLetter; $i++)
-        {
+        for ($i = 0; $i -lt $messagesToDeadLetter; $i++) {
             $ServiceBusUtils.ReceiveAndDeadLetterAMessage($queue)
         }
     }
 
-    for ($i = 0; $i -lt $messagesToSendToEachEntity; $i++)
-    {
+    for ($i = 0; $i -lt $messagesToSendToEachEntity; $i++) {
         $ServiceBusUtils.SendTestMessage($testTopic)
     }
     
-    foreach ($subscription in $subscriptions)
-    {
+    foreach ($subscription in $subscriptions) {
         $subscriptionPath = $ServiceBusUtils.BuildSubscriptionPath($testTopic, $subscription)
 
-        for ($i = 0; $i -lt $messagesToDeadLetter; $i++)
-        {
+        for ($i = 0; $i -lt $messagesToDeadLetter; $i++) {
             $ServiceBusUtils.ReceiveAndDeadLetterAMessage($subscriptionPath)
         }
+    }
+
+    $batchMessages = [System.Collections.Generic.List[string]]@()
+
+    foreach ($queue in $queuesBatch) {
+        for ($i = 0; $i -lt $messagesToSendInBatch; $i++) {
+            $batchMessages.Add(([System.Guid]::NewGuid()).Guid)
+        }
+
+        $ServiceBusUtils.SendMessagesInBatch($queue, $batchMessages.ToArray())
     }
 
     # tests
@@ -96,6 +103,15 @@ Describe "Clear-SbQueue tests" {
             $output = Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NoOutput
             $output | Should -Be $null
         }
+
+        It "should close the receiver connection after purge, pumping new messages in the queue, should all be kept" {
+            $queue = $queuesBatch[0]
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            Start-Sleep -Seconds 1
+            $ServiceBusUtils.SendMessagesInBatch($queue, $batchMessages.ToArray())
+            Start-Sleep -Seconds 1
+            $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.ActiveMessageCount | Should -Be $messagesToSendInBatch
+        }
     }
 
     Context "Test clearing a subscription" {
@@ -141,8 +157,11 @@ Describe "Clear-SbQueue tests" {
 
     # tear down
 
-    foreach ($queue in $queues)
-    {
+    foreach ($queue in $queues) {
+        $ServiceBusUtils.RemoveQueue($queue)
+    }
+
+    foreach ($queue in $queuesBatch) {
         $ServiceBusUtils.RemoveQueue($queue)
     }
 
