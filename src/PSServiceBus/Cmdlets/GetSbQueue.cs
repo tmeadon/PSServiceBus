@@ -67,13 +67,24 @@ namespace PSServiceBus.Cmdlets
             {
                 QueueRuntimeInfo queueRuntimeInfo = SbManager.GetQueueRuntimeInfo(queue.Path);
 
-                result.Add(new SbQueue
-                {
+                SbQueue sbQueue = new SbQueue {
                     Name = queue.Path,
                     ActiveMessages = queueRuntimeInfo.MessageCountDetails.ActiveMessageCount,
                     DeadLetteredMessages = queueRuntimeInfo.MessageCountDetails.DeadLetterMessageCount,
-                    ScheduledMessageCount = queueRuntimeInfo.MessageCountDetails.ScheduledMessageCount
-                });
+                    ScheduledMessageCount = queueRuntimeInfo.MessageCountDetails.ScheduledMessageCount,
+                    DefaultMessageTtlInDays = queue.DefaultMessageTimeToLive,
+                    LockDuration = queue.LockDuration,
+                    DuplicateDetectionHistoryTimeWindow = queue.DuplicateDetectionHistoryTimeWindow,
+                    MaxDeliveryCount = queue.MaxDeliveryCount,
+                    EnableBatchedOperations = queue.EnableBatchedOperations,
+                    MaxSizeInMB = queue.MaxSizeInMB,
+                    CurrentSizeInMB = (queueRuntimeInfo.SizeInBytes / 1000000),
+                    Status = queue.Status.ToString()
+                };
+
+                sbQueue.PercentageCapacityFree = (int)(((float)(sbQueue.MaxSizeInMB - sbQueue.CurrentSizeInMB) / sbQueue.MaxSizeInMB) * 100);
+
+                result.Add(sbQueue);
             }
 
             return result;
