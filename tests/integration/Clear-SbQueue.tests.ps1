@@ -11,12 +11,12 @@ Describe "Clear-SbQueue tests" {
 
     # create some queues, topics and subscriptions and allow time for it to complete
 
-    $queues = $ServiceBusUtils.CreateQueues(2)
+    $queues = $ServiceBusUtils.CreateQueues(4)
 
     $testTopic = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopic)
 
-    $subscriptions = $ServiceBusUtils.CreateSubscriptions($testTopic, 2)
+    $subscriptions = $ServiceBusUtils.CreateSubscriptions($testTopic, 4)
 
     # send some messages to the queues and the topic and dead letter a portion of them
 
@@ -83,6 +83,19 @@ Describe "Clear-SbQueue tests" {
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.DeadLetterMessageCount | Should -Be 0
         }
+
+        It "should return the output of Get-SbQueue if -NoOutput is not supplied" {
+            $queue = $queues[2]
+            $output = Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            $expectedOutput = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue
+            Compare-Object -ReferenceObject $output -DifferenceObject $expectedOutput | Should -Be $null
+        }
+
+        It "should return no output if -NoOutput is supplied" {
+            $queue = $queues[3]
+            $output = Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NoOutput
+            $output | Should -Be $null
+        }
     }
 
     Context "Test clearing a subscription" {
@@ -99,6 +112,19 @@ Describe "Clear-SbQueue tests" {
             Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -DeadLetterQueue
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetSubscriptionRuntimeInfo($testTopic, $subscription).MessageCountDetails.DeadLetterMessageCount | Should -Be 0
+        }
+
+        It "should return the output of Get-SbSubscription if -NoOutput is not supplied" {
+            $subscription = $subscriptions[2]
+            $output = Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription
+            $expectedOutput = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription
+            Compare-Object -ReferenceObject $output -DifferenceObject $expectedOutput | Should -Be $null
+        }
+
+        It "should return no output if -NoOutput is supplied" {
+            $subscription = $subscriptions[3]
+            $output = Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -NoOutput
+            $output | Should -Be $null
         }
     }
 
