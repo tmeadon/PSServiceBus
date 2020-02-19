@@ -75,6 +75,16 @@ Describe "Get-SbSubscription tests" {
         $testTopic = $topics[0]
 
         $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName
+
+        $expectedSubscriptionProperties = @()
+
+        foreach ($item in $result)
+        {
+            $expectedSubscriptionProperties += @{
+                Name = $item.Name
+                Properties = $ServiceBusUtils.GetSubscription($testTopic.TopicName, $item.Name)
+            }
+        }
         
         It "should return all of the subscriptions in a topic" {
             $result.count | Should -Be $testTopic.Subscriptions.count
@@ -93,31 +103,93 @@ Describe "Get-SbSubscription tests" {
                 $item.DeadLetteredMessages | Should -Be $messagesToDeadLetter
             }
         }
+
+        It "should return the correct value for DefaultMessageTtlInDays" {
+            foreach ($item in $result)
+            {
+                $item.DefaultMessageTtlInDays | Should -EQ $expectedSubscriptionProperties.Where({$_.Name -eq $item.Name}).Properties.DefaultMessageTimeToLive
+            }
+        }
+
+        It "should return the correct value for LockDuration" {
+            foreach ($item in $result)
+            {
+                $item.LockDuration | Should -EQ $expectedSubscriptionProperties.Where({$_.Name -eq $item.Name}).Properties.LockDuration
+            }
+        }
+
+        It "should return the correct value for MaxDeliveryCount" {
+            foreach ($item in $result)
+            {
+                $item.MaxDeliveryCount | Should -EQ $expectedSubscriptionProperties.Where({$_.Name -eq $item.Name}).Properties.MaxDeliveryCount
+            }
+        }
+
+        It "should return the correct value for EnableBatchedOperations" {
+            foreach ($item in $result)
+            {
+                $item.EnableBatchedOperations | Should -EQ $expectedSubscriptionProperties.Where({$_.Name -eq $item.Name}).Properties.EnableBatchedOperations
+            }
+        }
+
+        It "should return the correct value for Status" {
+            foreach ($item in $result)
+            {
+                $item.Status | Should -EQ $expectedSubscriptionProperties.Where({$_.Name -eq $item.Name}).Properties.Status.ToString()
+            }
+        }
     }
 
     Context "Tests with -SubscriptionName parameter" {
 
         $testTopic = $topics[0]
 
-        $testCases = @( foreach ($sub in $testTopic.Subscriptions) { @{Subscription = $sub} } )
+        $testCases = @( foreach ($sub in $testTopic.Subscriptions) { @{
+            Subscription = $sub
+            Result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName -SubscriptionName $sub
+            Properties = $ServiceBusUtils.GetSubscription($testTopic.TopicName, $sub)
+        } } )
 
         It "should return the correct subscription" -TestCases $testCases {
-            param ([string] $subscription)
-            $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName -SubscriptionName $subscription
+            param ([string] $subscription, [object] $result)
             $result.Name | Should -Be $subscription
         }
 
         It "should return the correct number of active messages in a specific subscription" -TestCases $testCases {
-            param ([string] $subscription)
-            $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName -SubscriptionName $subscription
+            param ([string] $subscription, [object] $result)
             $result.ActiveMessages | Should -Be ($messagesToSendToEachQueue - $messagesToDeadLetter)
         }
 
         It "should return the correct number of dead lettered messages in a specific subscription" -TestCases $testCases {
-            param ([string] $subscription)
-            $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic.TopicName -SubscriptionName $subscription
+            param ([string] $subscription, [object] $result)
             $result.DeadLetteredMessages | Should -Be $messagesToDeadLetter
         }
+
+        It "should return the correct value for DefaultMessageTtlInDays" -TestCases $testCases {
+            param ([string] $subscription, [object] $result, [object] $properties)
+            $result.DefaultMessageTtlInDays | Should -EQ $properties.DefaultMessageTimeToLive
+        }
+
+        It "should return the correct value for LockDuration" -TestCases $testCases {
+            param ([string] $subscription, [object] $result, [object] $properties)
+            $result.LockDuration | Should -EQ $properties.LockDuration
+        }
+
+        It "should return the correct value for MaxDeliveryCount" -TestCases $testCases {
+            param ([string] $subscription, [object] $result, [object] $properties)
+            $result.MaxDeliveryCount | Should -EQ $properties.MaxDeliveryCount
+        }
+
+        It "should return the correct value for EnableBatchedOperations" -TestCases $testCases {
+            param ([string] $subscription, [object] $result, [object] $properties)
+            $result.EnableBatchedOperations | Should -EQ $properties.EnableBatchedOperations
+        }
+
+        It "should return the correct value for Status" -TestCases $testCases {
+            param ([string] $subscription, [object] $result, [object] $properties)
+            $result.Status | Should -EQ $properties.Status.ToString()
+        }
+
     }
 
     # tear down queues created for test
