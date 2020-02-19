@@ -46,6 +46,11 @@
             <para type="description">Retrieves messages from the entity's dead letter queue.</para>
             </summary>
         </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.NoOutput">
+            <summary>
+            <para type="description">Prevents the cmdlet from outputting the queue/subscription after purge is complete</para>
+            </summary>
+        </member>
         <member name="M:PSServiceBus.Cmdlets.ClearSbQueue.ProcessRecord">
             <summary>
             Main cmdlet method.
