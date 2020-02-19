@@ -64,6 +64,12 @@ namespace PSServiceBus.Cmdlets
         public SwitchParameter DeadLetterQueue { get; set; }
 
         /// <summary>
+        /// <para type="description">Prevents the cmdlet from outputting the queue/subscription after purge is complete</para>
+        /// </summary>
+        [Parameter]
+        public SwitchParameter NoOutput { get; set; }
+
+        /// <summary>
         /// Main cmdlet method.
         /// </summary>
         protected override void ProcessRecord()
@@ -82,6 +88,26 @@ namespace PSServiceBus.Cmdlets
 
             sbReceiver.PurgeMessages();
             sbReceiver.Dispose();
+
+            // use existing PSServiceBus cmdlets to retrieve the queue/subscription to show user the result of the purge
+            if (!this.NoOutput)
+            {
+                if (this.ParameterSetName == "ClearQueue")
+                {
+                    GetSbQueue getSbQueue = new GetSbQueue();
+                    getSbQueue.NamespaceConnectionString = NamespaceConnectionString;
+                    getSbQueue.QueueName = QueueName;
+                    WriteObject(getSbQueue.Invoke());
+                }
+                else
+                {
+                    GetSbSubscription getSbSubscription = new GetSbSubscription();
+                    getSbSubscription.NamespaceConnectionString = NamespaceConnectionString;
+                    getSbSubscription.TopicName = TopicName;
+                    getSbSubscription.SubscriptionName = SubscriptionName;
+                    WriteObject(getSbSubscription.Invoke());
+                }
+            }
         }
     }
 }
