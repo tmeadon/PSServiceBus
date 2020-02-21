@@ -20,6 +20,10 @@ Describe "Clear-SbQueue tests" {
 
     $subscriptions = $ServiceBusUtils.CreateSubscriptions($testTopic, 4)
 
+    $testTopicBatch = (New-Guid).Guid
+    $ServiceBusUtils.CreateTopic($testTopicBatch)
+    $subscriptionsBatch = $ServiceBusUtils.CreateSubscriptions($testTopicBatch, 1)
+
     # send some messages to the queues and the topic and dead letter a portion of them
 
     $messagesToSendToEachEntity = 5
@@ -28,6 +32,7 @@ Describe "Clear-SbQueue tests" {
     $messagesToSendInBatch = 200
     $batchReceiveQty = 5
     $batchPrefetchQty = 5
+    $batchTimeout = 4
 
     foreach ($queue in $queues) {
         for ($i = 0; $i -lt $messagesToSendToEachEntity; $i++) {
@@ -60,6 +65,8 @@ Describe "Clear-SbQueue tests" {
     foreach ($queue in $queuesBatch) {
         $ServiceBusUtils.SendMessagesInBatch($queue, $batchMessages.ToArray())
     }
+
+    $ServiceBusUtils.SendMessagesInBatch($testTopicBatch, $batchMessages.ToArray())
 
     # tests
 
@@ -119,9 +126,19 @@ Describe "Clear-SbQueue tests" {
         It "should fetch batches of $batchReceiveQty or less if -ReceiveBatchQty $batchReceiveQty is supplied" {
             $queue = $queuesBatch[1]
             $temp = @(Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -ReceiveBatchQty $batchReceiveQty -PrefetchQty $batchPrefetchQty -Verbose 4>&1)
-            $counters = @($temp.Message | ForEach-Object {[int]$_.Replace("Received Message Count: ", "")})
+            $counters = @($temp.Message | Where-Object { $_ -Like "Received Message Count:*" } | ForEach-Object { [int]$_.Replace("Received Message Count: ", "") })
             $counters -gt $batchReceiveQty | Should -BeNullOrEmpty
         }
+
+        It "should wait at least the number of seconds specified with the -TimeoutInSeconds $batchTimeout" {
+            #reusing the previous on purpose. We need an empty queue, to make the wait as close as possible
+            $queue = $queuesBatch[1]
+            $temp = Measure-Command { Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -ReceiveBatchQty $batchReceiveQty -PrefetchQty $batchPrefetchQty -TimeoutInSeconds $batchTimeout }
+            $([System.Double]::Parse($temp.TotalSeconds)) | Should -BeGreaterThan $([System.Double]::Parse($batchTimeout))
+        }
+        <#
+        Measure-Command { Clear-SbQueue -QueueName erp-inventory-full-queue -ReceiveBatchQty 200 -PrefetchQty 200 -TimeoutInSeconds 4}
+        #>
     }
 
     Context "Test clearing a subscription" {
@@ -152,6 +169,20 @@ Describe "Clear-SbQueue tests" {
             $output = Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $subscription -NoOutput
             $output | Should -Be $null
         }
+
+        It "should fetch batches of $batchReceiveQty or less if -ReceiveBatchQty $batchReceiveQty is supplied" {
+            $subscription = $subscriptionsBatch[0]
+            $temp = @(Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopicBatch -SubscriptionName $subscription -ReceiveBatchQty $batchReceiveQty -PrefetchQty $batchPrefetchQty -Verbose 4>&1)
+            $counters = @($temp.Message | Where-Object { $_ -Like "Received Message Count:*" } | ForEach-Object { [int]$_.Replace("Received Message Count: ", "") })
+            $counters -gt $batchReceiveQty | Should -BeNullOrEmpty
+        }
+
+        It "should wait at least the number of seconds specified with the -TimeoutInSeconds $batchTimeout" {
+            #reusing the previous on purpose. We need an empty queue, to make the wait as close as possible
+            $subscription = $subscriptionsBatch[0]
+            $temp = Measure-Command { Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopicBatch -SubscriptionName $subscription -ReceiveBatchQty $batchReceiveQty -PrefetchQty $batchPrefetchQty -TimeoutInSeconds $batchTimeout }
+            $([System.Double]::Parse($temp.TotalSeconds)) | Should -BeGreaterThan $([System.Double]::Parse($batchTimeout))
+        }
     }
 
     Context "Negative tests" {
@@ -176,4 +207,6 @@ Describe "Clear-SbQueue tests" {
     }
 
     $ServiceBusUtils.RemoveTopic($testTopic)
+    
+    $ServiceBusUtils.RemoveTopic($testTopicBatch)
 }
