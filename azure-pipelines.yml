@@ -12,10 +12,6 @@ variables:
     value: $[counter('',0)]
 
 trigger:
-  branches:
-    include:
-    - master
-    - refs/tags/*
   paths:
     exclude:
       - README.md
