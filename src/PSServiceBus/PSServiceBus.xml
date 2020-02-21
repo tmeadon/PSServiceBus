@@ -66,6 +66,11 @@
             <para type="description">The number of messages to prefetch - defaults to 1. While the cmdlet is working on a batch of messages, it can utilize some caching mechanisms that will prefetch messages in a background thread. Increasing this number will increase the efficiency for the cmdlet and makes the purge operation faster.</para>
             </summary>
         </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.TimeoutInSeconds">
+            <summary>
+            <para type="description">The timeout in seconds before the operation should return a result - defaults to 1. The timeout value impacts the receiving logic to try and get messages back. If to low the purge operation might leave messages behind, it to high you will be waiting even when it doesn't do anything.</para>
+            </summary>
+        </member>
         <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.DeadLetterQueue">
             <summary>
             <para type="description">Retrieves messages from the entity's dead letter queue.</para>

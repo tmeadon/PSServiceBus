@@ -85,6 +85,12 @@ namespace PSServiceBus.Cmdlets
         public int PrefetchQty { get; set; } = 1;
 
         /// <summary>
+        /// <para type="description">The timeout in seconds before the operation should return a result - defaults to 1. The timeout value impacts the receiving logic to try and get messages back. If to low the purge operation might leave messages behind, it to high you will be waiting even when it doesn't do anything.</para>
+        /// </summary>
+        [Parameter]
+        public int TimeoutInSeconds { get; set; } = 1;
+
+        /// <summary>
         /// <para type="description">Retrieves messages from the entity's dead letter queue.</para>
         /// </summary>
         [Parameter]
@@ -106,14 +112,14 @@ namespace PSServiceBus.Cmdlets
 
             if (this.ParameterSetName == "ClearQueue")
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, DeadLetterQueue, sbManager, ReceiveBatchQty, PrefetchQty, true);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, DeadLetterQueue, sbManager, PrefetchQty, true);
             }
             else
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, DeadLetterQueue, sbManager, ReceiveBatchQty, PrefetchQty, true);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, DeadLetterQueue, sbManager, PrefetchQty, true);
             }
             
-            sbReceiver.PurgeMessages(this);
+            sbReceiver.PurgeMessages(this, ReceiveBatchQty, TimeoutInSeconds);
             sbReceiver.Dispose();
 
             // use existing PSServiceBus cmdlets to retrieve the queue/subscription to show user the result of the purge
