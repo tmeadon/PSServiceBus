@@ -12,18 +12,21 @@ using System.Threading;
 namespace PSServiceBus.Helpers
 {
     /// <summary></summary>
-    public class SbReceiver: IDisposable
+    public class SbReceiver : IDisposable
     {
         private readonly MessageReceiver messageReceiver;
         private readonly CancellationTokenSource tokenCancel;
 
-        public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager, bool PurgeMode = false)
+        private readonly int prefetchQty;
+
+        public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
         {
             tokenCancel = new CancellationTokenSource();
+            prefetchQty = PrefetchQty;
 
             ReceiveMode receiveMode = ReceiveMode.PeekLock;
 
-            if(PurgeMode)
+            if (PurgeMode)
             {
                 receiveMode = ReceiveMode.ReceiveAndDelete;
             }
@@ -45,9 +48,10 @@ namespace PSServiceBus.Helpers
             }
         }
 
-        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager, bool PurgeMode = false)
+        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
         {
             tokenCancel = new CancellationTokenSource();
+            prefetchQty = PrefetchQty;
 
             ReceiveMode receiveMode = ReceiveMode.PeekLock;
 
@@ -112,7 +116,7 @@ namespace PSServiceBus.Helpers
             for (int i = 0; i < NumberOfMessages; i++)
             {
                 Message message = messageReceiver.PeekBySequenceNumberAsync((messageReceiver.LastPeekedSequenceNumber + 1)).Result;
-                
+
                 if (message != null)
                 {
                     messages.Add(message);
@@ -122,7 +126,7 @@ namespace PSServiceBus.Helpers
                     break;
                 }
             }
-            
+
             return BuildMessageList(messages);
         }
 
@@ -139,7 +143,7 @@ namespace PSServiceBus.Helpers
                 messages = new List<Message>();
                 throw new Exception("Something while peeking for messages in batch against the Service Bus.", E);
             }
-            
+
             return BuildMessageList(messages);
         }
 
@@ -165,7 +169,7 @@ namespace PSServiceBus.Helpers
             return BuildMessageList(messages);
         }
 
-        public void PurgeMessages()
+        public void PurgeMessages(System.Management.Automation.Cmdlet cmdlet, int ReceiveBatchQty, int TimeoutInSeconds)
         {
             try
             {
@@ -176,18 +180,32 @@ namespace PSServiceBus.Helpers
                     //Did we invoke the dispose of this receiver?
                     if (tokenCancel.IsCancellationRequested)
                     {
+                        cmdlet.WriteVerbose("CancellationRequested is invoked.");
+
                         break;
                     }
 
                     //Is the messageReceiver in a closing state?
                     if (messageReceiver.IsClosedOrClosing)
                     {
+                        cmdlet.WriteVerbose("Receiver is going into closed state.");
+
                         break;
                     }
 
-                    var temp = messageReceiver.ReceiveAsync(100, TimeSpan.FromSeconds(1));
+                    var temp = messageReceiver.ReceiveAsync(ReceiveBatchQty, TimeSpan.FromSeconds(TimeoutInSeconds));
                     temp.Wait();
                     res = temp.Result;
+
+                    if (res != null && res.Count > 0)
+                    {
+                        cmdlet.WriteVerbose("Received Message Count: " + res.Count.ToString());
+                    }
+                    else
+                    {
+                        string verboseMessage = res == null ? "The result object was null" : $"The result count was: {res.Count}";
+                        cmdlet.WriteVerbose(verboseMessage);
+                    }
 
                 } while (res != null && res.Count > 0);
             }
@@ -196,7 +214,7 @@ namespace PSServiceBus.Helpers
                 throw E;
             }
         }
-        
+
         private IList<SbMessage> ReceiveAndDeleteInBatch(int NumberOfMessages)
         {
             IList<Message> messages = null;
@@ -205,7 +223,7 @@ namespace PSServiceBus.Helpers
             {
                 messages = messageReceiver.ReceiveAsync(NumberOfMessages).Result;
 
-                if(messages != null && messages.Count > 0)
+                if (messages != null && messages.Count > 0)
                 {
                     messageReceiver.CompleteAsync(messages.Select(x => x.SystemProperties.LockToken).ToList());
                 }
@@ -227,7 +245,7 @@ namespace PSServiceBus.Helpers
             //ReceiveAndDelete indicates that we are running the Purge mode
             if (Mode == ReceiveMode.ReceiveAndDelete)
             {
-                messageReceiver.PrefetchCount = 100;
+                messageReceiver.PrefetchCount = this.prefetchQty;
             }
 
             return messageReceiver;
@@ -236,7 +254,7 @@ namespace PSServiceBus.Helpers
         private string ConvertMessageBodyToString(byte[] bodyBytes)
         {
             string bodyStr = Encoding.UTF8.GetString(bodyBytes);
-            return bodyStr;   
+            return bodyStr;
         }
 
         private IList<SbMessage> BuildMessageList(IList<Message> Messages)
