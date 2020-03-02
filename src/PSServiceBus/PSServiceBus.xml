@@ -81,7 +81,7 @@
             <para type="description">Prevents the cmdlet from outputting the queue/subscription after purge is complete</para>
             </summary>
         </member>
-        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.QueueStore">
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.QueueStores">
             <summary>
             <para type="description">Select which queue store(s) to clear out</para>
             </summary>

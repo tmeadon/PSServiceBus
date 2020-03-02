@@ -292,6 +292,29 @@ namespace PSServiceBus.Helpers
             return res;
         }
 
+        public IList<long> FindScheduledMessages()
+        {
+            // peek all messages and then filter for messages which have a non-default value for ScheduledEnqueuedTimeUtc
+            
+            List<long> sequenceNumbers = new List<long>();
+            Message message;
+
+            do
+            {
+                message = messageReceiver.PeekBySequenceNumberAsync((messageReceiver.LastPeekedSequenceNumber + 1)).Result;
+
+                if (message != null)
+                {
+                    if (message.ScheduledEnqueueTimeUtc.ToString() != "01/01/0001 00:00:00")
+                    {
+                        sequenceNumbers.Add(message.SystemProperties.SequenceNumber);
+                    }
+                }
+            } while (message != null);
+
+            return sequenceNumbers;
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
