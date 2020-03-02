@@ -74,6 +74,7 @@ namespace PSServiceBus.Cmdlets
         /// <para type="description">The number of messages to retrieve - defaults to 1.</para>
         /// </summary>
         [Parameter]
+        [Alias("NumberOfMessagesToRetrieve")]
         public int ReceiveQty { get; set; } = 1;
 
         /// <summary>

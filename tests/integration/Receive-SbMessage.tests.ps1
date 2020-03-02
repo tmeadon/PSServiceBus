@@ -11,7 +11,7 @@ Describe "Receive-SbMessage tests" {
 
     # create some queues, topics and subscriptions and allow time for it to complete
 
-    $queues = $ServiceBusUtils.CreateQueues(6)
+    $queues = $ServiceBusUtils.CreateQueues(7)
 
     $testTopic = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopic)
@@ -141,6 +141,13 @@ Describe "Receive-SbMessage tests" {
             Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -ReceiveQty $messagesToReceive -ReceiveType ReceiveAndDelete -ReceiveFromDeadLetterQueue
             Start-Sleep -Seconds 1
             $ServiceBusUtils.GetQueueRuntimeInfo($queue).MessageCountDetails.DeadLetterMessageCount | Should -Be ($messagesToDeadLetter - $messagesToReceive)
+        }
+
+        It "should receive the correct number of messages if -NumberOfMessagesToRetrieve (alias) is supplied" -TestCases @{messages = 2}, @{messages = 3} {
+            param ([int] $messages)
+            $queue = $queues[6]
+            $result = Receive-SbMessage -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -NumberOfMessagesToRetrieve $messages
+            $result.count | Should -Be $messages
         }
     }
 
