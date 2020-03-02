@@ -12,6 +12,9 @@ variables:
     value: $[counter('',0)]
 
 trigger:
+  branches:
+    include:
+      - '*'
   paths:
     exclude:
       - README.md
@@ -92,3 +95,4 @@ stages:
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
         condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+

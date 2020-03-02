@@ -8,9 +8,9 @@ namespace PSServiceBus.Cmdlets
 {
     /// <summary>
     /// <para type="synopsis">Receives a message or messages from an Azure Service Bus queue or subscription.</para>
-    /// <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription.  Two receive modes are available:</para>
-    /// <para type="description">PeekOnly/ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
-    /// <para type="description">received using the -NumberOfMessagesToRetrieve parameter, they will be returned individually to the pipeline.  Messages can also be</para>
+    /// <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription. Two receive modes are available:</para>
+    /// <para type="description">PeekOnly/ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue. Multiple messages can be</para>
+    /// <para type="description">received using the -ReceiveQty parameter, they will be returned individually to the pipeline. Messages can also be</para>
     /// <para type="description">received from the dead letter queue by adding the -ReceiveFromDeadLetterQueue parameter.</para>
     /// </summary>
     /// <example>
@@ -19,7 +19,7 @@ namespace PSServiceBus.Cmdlets
     /// <para></para>
     /// </example>
     /// <example>
-    /// <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription' -NumberOfMessagesToRetrieve 5</code>
+    /// <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription' -ReceiveQty 5</code>
     /// <para>Receives 5 messages from the subscription called 'example-subscription' in the topic 'example-topic' and leaves them there</para>
     /// <para></para>
     /// </example>
@@ -74,7 +74,8 @@ namespace PSServiceBus.Cmdlets
         /// <para type="description">The number of messages to retrieve - defaults to 1.</para>
         /// </summary>
         [Parameter]
-        public int NumberOfMessagesToRetrieve { get; set; } = 1;
+        [Alias("NumberOfMessagesToRetrieve")]
+        public int ReceiveQty { get; set; } = 1;
 
         /// <summary>
         /// <para type="description">Specifies the receive behaviour - defaults to PeekOnly.</para>
@@ -117,7 +118,7 @@ namespace PSServiceBus.Cmdlets
                 sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, receiveFromStore, sbManager);
             }
 
-            IList<SbMessage> sbMessages = sbReceiver.ReceiveMessages(NumberOfMessagesToRetrieve, ReceiveType);
+            IList<SbMessage> sbMessages = sbReceiver.ReceiveMessages(ReceiveQty, ReceiveType);
 
             foreach (SbMessage sbMessage in sbMessages)
             {

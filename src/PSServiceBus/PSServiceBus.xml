@@ -186,9 +186,9 @@
         <member name="T:PSServiceBus.Cmdlets.ReceiveSbMessage">
             <summary>
             <para type="synopsis">Receives a message or messages from an Azure Service Bus queue or subscription.</para>
-            <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription.  Two receive modes are available:</para>
-            <para type="description">PeekOnly/ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue.  Multiple messages can be</para>
-            <para type="description">received using the -NumberOfMessagesToRetrieve parameter, they will be returned individually to the pipeline.  Messages can also be</para>
+            <para type="description">This cmdlet retrieves a message or messages from an Azure Service Bus queue or subscription. Two receive modes are available:</para>
+            <para type="description">PeekOnly/ReceiveAndKeep (default) and ReceiveAndDelete which if specified will remove the message from the queue. Multiple messages can be</para>
+            <para type="description">received using the -ReceiveQty parameter, they will be returned individually to the pipeline. Messages can also be</para>
             <para type="description">received from the dead letter queue by adding the -ReceiveFromDeadLetterQueue parameter.</para>
             </summary>
             <example>
@@ -197,7 +197,7 @@
             <para></para>
             </example>
             <example>
-            <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription' -NumberOfMessagesToRetrieve 5</code>
+            <code>Receive-SbMessage -NamespaceConnectionString $namespaceConnectionString -TopicName 'example-topic' -SubscriptionName 'example-subscription' -ReceiveQty 5</code>
             <para>Receives 5 messages from the subscription called 'example-subscription' in the topic 'example-topic' and leaves them there</para>
             <para></para>
             </example>
@@ -232,7 +232,7 @@
             <para type="description">The name of the subscription to retrieve messages from.</para>
             </summary>
         </member>
-        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.NumberOfMessagesToRetrieve">
+        <member name="P:PSServiceBus.Cmdlets.ReceiveSbMessage.ReceiveQty">
             <summary>
             <para type="description">The number of messages to retrieve - defaults to 1.</para>
             </summary>
