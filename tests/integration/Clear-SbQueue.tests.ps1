@@ -9,26 +9,25 @@ Describe "Clear-SbQueue tests" {
 
     # setup
 
-    # create some queues, topics and subscriptions and allow time for it to complete
+    # create some queues, topics and subscriptions
 
-    $queues = $ServiceBusUtils.CreateQueues(4)
-
+    $queues = $ServiceBusUtils.CreateQueues(10)
     $queuesBatch = $ServiceBusUtils.CreateQueues(2)
-
     $testTopic = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopic)
-
-    $subscriptions = $ServiceBusUtils.CreateSubscriptions($testTopic, 4)
-
+    $subscriptions = $ServiceBusUtils.CreateSubscriptions($testTopic, 10)
     $testTopicBatch = (New-Guid).Guid
     $ServiceBusUtils.CreateTopic($testTopicBatch)
     $subscriptionsBatch = $ServiceBusUtils.CreateSubscriptions($testTopicBatch, 1)
 
-    # send some messages to the queues and the topic and dead letter a portion of them
+    # send some messages to the queues and the topic and dead letter a portion of them, also schedule some messages
 
     $messagesToSendToEachEntity = 5
     $messagesToDeadLetter = 2
-    
+    $messagesToSchedule = 3
+    $enqueueMinutesIntoFuture = 10
+    $enqueueDatetime = (Get-Date).AddMinutes($enqueueMinutesIntoFuture).ToUniversalTime()
+
     $messagesToSendInBatch = 200
     $batchReceiveQty = 5
     $batchPrefetchQty = 5
@@ -42,10 +41,18 @@ Describe "Clear-SbQueue tests" {
         for ($i = 0; $i -lt $messagesToDeadLetter; $i++) {
             $ServiceBusUtils.ReceiveAndDeadLetterAMessage($queue)
         }
+
+        for ($i = 0; $i -lt $messagesToSchedule; $i++) {
+            $ServiceBusUtils.ScheduleTestMessage($queue, $enqueueDatetime)
+        }
     }
 
     for ($i = 0; $i -lt $messagesToSendToEachEntity; $i++) {
         $ServiceBusUtils.SendTestMessage($testTopic)
+    }
+
+    for ($i = 0; $i -lt $messagesToSchedule; $i++) {
+        $ServiceBusUtils.ScheduleTestMessage($testTopic, $enqueueDatetime)
     }
     
     foreach ($subscription in $subscriptions) {
@@ -87,7 +94,7 @@ Describe "Clear-SbQueue tests" {
 
     Context "Test clearing a queue" {
 
-        It "should clear all messages" {
+        It "should clear all messages from the active queue by default" {
             $queue = $queues[0]
             Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -Verbose:$false
             Start-Sleep -Seconds 1
@@ -136,9 +143,54 @@ Describe "Clear-SbQueue tests" {
             $temp = Measure-Command { Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $queue -ReceiveBatchQty $batchReceiveQty -PrefetchQty $batchPrefetchQty -TimeoutInSeconds $batchTimeout }
             $([System.Double]::Parse($temp.TotalSeconds)) | Should -BeGreaterThan $([System.Double]::Parse($batchTimeout))
         }
-        <#
-        Measure-Command { Clear-SbQueue -QueueName erp-inventory-full-queue -ReceiveBatchQty 200 -PrefetchQty 200 -TimeoutInSeconds 4}
-        #>
+
+        # define some test cases for testing the -QueueStores parameter
+        $testCases = @(
+            @{
+                testQueue = $queues[4]
+                queueStoreParamValue = 'Active'
+                expectedActiveCount = 0
+                expectedDeadLetterCount = $messagesToDeadLetter
+                expectedScheduledCount = $messagesToSchedule
+            },
+            @{
+                testQueue = $queues[5]
+                queueStoreParamValue = 'DeadLetter'
+                expectedActiveCount = $messagesToSendToEachEntity - $messagesToDeadLetter
+                expectedDeadLetterCount = 0
+                expectedScheduledCount = $messagesToSchedule
+            },
+            @{
+                testQueue = $queues[6]
+                queueStoreParamValue = 'Scheduled'
+                expectedActiveCount = $messagesToSendToEachEntity - $messagesToDeadLetter
+                expectedDeadLetterCount = $messagesToDeadLetter
+                expectedScheduledCount = 0
+            },
+            @{
+                testQueue = $queues[7]
+                queueStoreParamValue = 'All'
+                expectedActiveCount = 0
+                expectedDeadLetterCount = 0
+                expectedScheduledCount = 0
+            },
+            @{
+                testQueue = $queues[8]
+                queueStoreParamValue = 'Active', 'DeadLetter'
+                expectedActiveCount = 0
+                expectedDeadLetterCount = 0
+                expectedScheduledCount = $messagesToSchedule
+            }
+        )
+
+        It "should empty the correct queue stores when -QueueStores is supplied" -TestCases $testCases {
+            param ([string]$testQueue, [string[]]$queueStoreParamValue, [int]$expectedActiveCount, [int]$expectedDeadLetterCount, [int]$expectedScheduledCount)
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $testQueue -QueueStores $queueStoreParamValue
+            $result = Get-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -QueueName $testQueue
+            $result.ActiveMessages | Should -Be $expectedActiveCount
+            $result.DeadLetteredMessages | Should -Be $expectedDeadLetterCount
+            $result.ScheduledMessageCount | Should -Be $expectedScheduledCount
+        }
     }
 
     Context "Test clearing a subscription" {
@@ -182,6 +234,48 @@ Describe "Clear-SbQueue tests" {
             $subscription = $subscriptionsBatch[0]
             $temp = Measure-Command { Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopicBatch -SubscriptionName $subscription -ReceiveBatchQty $batchReceiveQty -PrefetchQty $batchPrefetchQty -TimeoutInSeconds $batchTimeout }
             $([System.Double]::Parse($temp.TotalSeconds)) | Should -BeGreaterThan $([System.Double]::Parse($batchTimeout))
+        }
+
+        # define some test cases for testing the -QueueStores parameter
+        $testCases = @(
+            @{
+                testSub = $subscriptions[4]
+                queueStoreParamValue = 'Active'
+                expectedActiveCount = 0
+                expectedDeadLetterCount = $messagesToDeadLetter
+            },
+            @{
+                testSub = $subscriptions[5]
+                queueStoreParamValue = 'DeadLetter'
+                expectedActiveCount = $messagesToSendToEachEntity - $messagesToDeadLetter
+                expectedDeadLetterCount = 0
+            },
+            @{
+                testSub = $subscriptions[6]
+                queueStoreParamValue = 'Scheduled'
+                expectedActiveCount = $messagesToSendToEachEntity - $messagesToDeadLetter
+                expectedDeadLetterCount = $messagesToDeadLetter
+            },
+            @{
+                testSub = $subscriptions[7]
+                queueStoreParamValue = 'All'
+                expectedActiveCount = 0
+                expectedDeadLetterCount = 0
+            },
+            @{
+                testSub = $subscriptions[8]
+                queueStoreParamValue = 'Active', 'DeadLetter'
+                expectedActiveCount = 0
+                expectedDeadLetterCount = 0
+            }
+        )
+
+        It "should empty the correct queue stores when -QueueStores is supplied" -TestCases $testCases {
+            param ([string]$testSub, [string[]]$queueStoreParamValue, [int]$expectedActiveCount, [int]$expectedDeadLetterCount)
+            Clear-SbQueue -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $testSub -QueueStores $queueStoreParamValue
+            $result = Get-SbSubscription -NamespaceConnectionString $ServiceBusUtils.NamespaceConnectionString -TopicName $testTopic -SubscriptionName $testSub
+            $result.ActiveMessages | Should -Be $expectedActiveCount
+            $result.DeadLetteredMessages | Should -Be $expectedDeadLetterCount
         }
     }
 

@@ -81,6 +81,11 @@
             <para type="description">Prevents the cmdlet from outputting the queue/subscription after purge is complete</para>
             </summary>
         </member>
+        <member name="P:PSServiceBus.Cmdlets.ClearSbQueue.QueueStores">
+            <summary>
+            <para type="description">Select which queue store(s) to clear out</para>
+            </summary>
+        </member>
         <member name="M:PSServiceBus.Cmdlets.ClearSbQueue.ProcessRecord">
             <summary>
             Main cmdlet method.
@@ -477,6 +482,26 @@
             A Service Bus Subscription
             </summary>
         </member>
+        <member name="T:PSServiceBus.Enums.SbQueueStores">
+            <summary>
+            Valid Service Bus queue stores
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbQueueStores.Active">
+            <summary>
+            The 'active' queue store
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbQueueStores.DeadLetter">
+            <summary>
+            The 'deadletter' queue store
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Enums.SbQueueStores.Scheduled">
+            <summary>
+            The 'scheduled' queue store
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Enums.SbReceiveTypes">
             <summary>
             <para type="description">Valid ways to receive a message from a Service Bus entity</para>
@@ -548,6 +573,11 @@
         <member name="F:PSServiceBus.Outputs.SbMessage.UserProperties">
             <summary>
             User Properties
+            </summary>
+        </member>
+        <member name="F:PSServiceBus.Outputs.SbMessage.ScheduledEnqueuedTimeUtc">
+            <summary>
+            Datetime the messaged is scheduled to be enqueued
             </summary>
         </member>
         <member name="T:PSServiceBus.Outputs.SbMessageBatchTestResult">

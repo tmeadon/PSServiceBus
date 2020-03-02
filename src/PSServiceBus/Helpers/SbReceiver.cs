@@ -19,7 +19,7 @@ namespace PSServiceBus.Helpers
 
         private readonly int prefetchQty;
 
-        public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
+        public SbReceiver(string NamespaceConnectionString, string QueueName, SbQueueStores QueueStore, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
         {
             tokenCancel = new CancellationTokenSource();
             prefetchQty = PrefetchQty;
@@ -35,7 +35,7 @@ namespace PSServiceBus.Helpers
             {
                 string entityPath = QueueName;
 
-                if (ReceiveFromDeadLetter)
+                if (QueueStore == SbQueueStores.DeadLetter)
                 {
                     entityPath = sbManager.BuildDeadLetterPath(QueueName);
                 }
@@ -48,7 +48,7 @@ namespace PSServiceBus.Helpers
             }
         }
 
-        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
+        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, SbQueueStores QueueStore, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
         {
             tokenCancel = new CancellationTokenSource();
             prefetchQty = PrefetchQty;
@@ -65,7 +65,7 @@ namespace PSServiceBus.Helpers
                 string subscriptionPath = sbManager.BuildSubscriptionPath(TopicName, SubscriptionName);
                 string entityPath = subscriptionPath;
 
-                if (ReceiveFromDeadLetter)
+                if (QueueStore == SbQueueStores.DeadLetter)
                 {
                     entityPath = sbManager.BuildDeadLetterPath(subscriptionPath);
                 }
@@ -268,7 +268,8 @@ namespace PSServiceBus.Helpers
                     MessageId = message.MessageId,
                     MessageBody = ConvertMessageBodyToString(message.Body),
                     SystemProperties = ConvertSystemPropertiesToIDictonary(message.SystemProperties),
-                    UserProperties = message.UserProperties
+                    UserProperties = message.UserProperties,
+                    ScheduledEnqueuedTimeUtc = message.ScheduledEnqueueTimeUtc
                 });
             }
 
@@ -289,6 +290,29 @@ namespace PSServiceBus.Helpers
             res.Add("SequenceNumber", systemProperties.SequenceNumber);
 
             return res;
+        }
+
+        public IList<long> FindScheduledMessages()
+        {
+            // peek all messages and then filter for messages which have a non-default value for ScheduledEnqueuedTimeUtc
+            
+            List<long> sequenceNumbers = new List<long>();
+            Message message;
+
+            do
+            {
+                message = messageReceiver.PeekBySequenceNumberAsync((messageReceiver.LastPeekedSequenceNumber + 1)).Result;
+
+                if (message != null)
+                {
+                    if (message.ScheduledEnqueueTimeUtc.ToString() != "01/01/0001 00:00:00")
+                    {
+                        sequenceNumbers.Add(message.SystemProperties.SequenceNumber);
+                    }
+                }
+            } while (message != null);
+
+            return sequenceNumbers;
         }
 
         #region IDisposable Support

@@ -27,5 +27,10 @@ namespace PSServiceBus.Outputs
         /// User Properties
         /// </summary>
         public IDictionary<string,Object> UserProperties;
+
+        /// <summary>
+        /// Datetime the messaged is scheduled to be enqueued
+        /// </summary>
+        public DateTime ScheduledEnqueuedTimeUtc;
     }
 }

@@ -71,5 +71,10 @@ namespace PSServiceBus.Helpers
                 throw new InvalidOperationException("Message collection was empty.");
             }
         }
+
+        public void CancelScheduledMessage(long messageSequenceNumber)
+        {
+            messageSender.CancelScheduledMessageAsync(messageSequenceNumber).Wait();
+        }
     }
 }

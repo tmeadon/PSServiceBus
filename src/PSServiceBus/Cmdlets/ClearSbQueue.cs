@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Management.Automation;
 using PSServiceBus.Helpers;
 using PSServiceBus.Outputs;
@@ -103,24 +104,84 @@ namespace PSServiceBus.Cmdlets
         public SwitchParameter NoOutput { get; set; }
 
         /// <summary>
+        /// <para type="description">Select which queue store(s) to clear out</para>
+        /// </summary>
+        [Parameter]
+        [ValidateSet("Active","DeadLetter","Scheduled","All")]
+        public List<string> QueueStores { get; set; } = new List<string> { "Active" };
+
+        /// <summary>
         /// Main cmdlet method.
         /// </summary>
         protected override void ProcessRecord()
         {
             SbReceiver sbReceiver;
+            SbSender sbSender;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
 
-            if (this.ParameterSetName == "ClearQueue")
+            if (DeadLetterQueue)
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, DeadLetterQueue, sbManager, PrefetchQty, true);
+                QueueStores = new List<string> { "DeadLetter" };
             }
-            else
+
+            // iterate through QueueStores and convert to SbQueueStores enum values
+            IList<SbQueueStores> sbQueueStores = new List<SbQueueStores>();
+
+            foreach (var item in QueueStores)
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, DeadLetterQueue, sbManager, PrefetchQty, true);
+                switch (item)
+                {
+                    case "Active":
+                        sbQueueStores.Add(SbQueueStores.Active);
+                        break;
+                    
+                    case "DeadLetter":
+                        sbQueueStores.Add(SbQueueStores.DeadLetter);
+                        break;
+
+                    case "Scheduled":
+                        sbQueueStores.Add(SbQueueStores.Scheduled);
+                        break;
+
+                    case "All":
+                        sbQueueStores.Add(SbQueueStores.Active);
+                        sbQueueStores.Add(SbQueueStores.DeadLetter);
+                        sbQueueStores.Add(SbQueueStores.Scheduled);
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
             }
-            
-            sbReceiver.PurgeMessages(this, ReceiveBatchQty, TimeoutInSeconds);
-            sbReceiver.Dispose();
+
+            foreach (SbQueueStores store in sbQueueStores)
+            {
+                if (this.ParameterSetName == "ClearQueue")
+                {
+                    sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, store, sbManager, PrefetchQty, true);
+                    sbSender = new SbSender(NamespaceConnectionString, QueueName, SbEntityTypes.Queue, sbManager);
+                }
+                else
+                {
+                    sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, store, sbManager, PrefetchQty, true);
+                    sbSender = new SbSender(NamespaceConnectionString, TopicName, SbEntityTypes.Topic, sbManager);
+                }
+                
+                if (store == SbQueueStores.Scheduled)
+                {
+                    IList<long> scheduledMessages = sbReceiver.FindScheduledMessages();
+
+                    foreach (long msgSequenceNumber in scheduledMessages)
+                    {
+                        sbSender.CancelScheduledMessage(msgSequenceNumber);
+                    }
+                }
+                else
+                {
+                    sbReceiver.PurgeMessages(this, ReceiveBatchQty, TimeoutInSeconds);
+                    sbReceiver.Dispose();
+                }
+            }
 
             // use existing PSServiceBus cmdlets to retrieve the queue/subscription to show user the result of the purge
             if (!this.NoOutput)
