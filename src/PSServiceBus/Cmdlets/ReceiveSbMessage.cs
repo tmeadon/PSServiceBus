@@ -101,13 +101,20 @@ namespace PSServiceBus.Cmdlets
                 WriteWarning("The option ReceiveAndKeep will be deprecated in future versions. Please use 'PeekOnly' instead.");
             }
 
+            SbQueueStores receiveFromStore = SbQueueStores.Active;
+
+            if (ReceiveFromDeadLetterQueue)
+            {
+                receiveFromStore = SbQueueStores.DeadLetter;
+            }
+
             if (this.ParameterSetName == "ReceiveFromQueue")
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, ReceiveFromDeadLetterQueue, sbManager);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, receiveFromStore, sbManager);
             }
             else
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, ReceiveFromDeadLetterQueue, sbManager);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, receiveFromStore, sbManager);
             }
 
             IList<SbMessage> sbMessages = sbReceiver.ReceiveMessages(NumberOfMessagesToRetrieve, ReceiveType);

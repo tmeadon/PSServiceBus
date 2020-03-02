@@ -96,13 +96,20 @@ namespace PSServiceBus.Cmdlets
             SbReceiver sbReceiver;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
 
+            SbQueueStores receiveFromStore = SbQueueStores.Active;
+
+            if (ReceiveFromDeadLetterQueue)
+            {
+                receiveFromStore = SbQueueStores.DeadLetter;
+            }
+
             if (this.ParameterSetName == "ReceiveFromQueue")
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, ReceiveFromDeadLetterQueue, sbManager);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, receiveFromStore, sbManager);
             }
             else
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, ReceiveFromDeadLetterQueue, sbManager);
+                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, receiveFromStore, sbManager);
             }
 
             IList<SbMessage> sbMessages = sbReceiver.ReceiveMessagesInBatch(ReceiveQty, ReceiveType);

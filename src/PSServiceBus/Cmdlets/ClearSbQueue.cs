@@ -103,6 +103,12 @@ namespace PSServiceBus.Cmdlets
         public SwitchParameter NoOutput { get; set; }
 
         /// <summary>
+        /// <para type="description">Select which queue store(s) to clear out</para>
+        /// </summary>
+        [Parameter]
+        public IList<SbQueueStores> QueueStore { get; set; } = new List<SbQueueStores> { SbQueueStores.Active };
+
+        /// <summary>
         /// Main cmdlet method.
         /// </summary>
         protected override void ProcessRecord()
@@ -110,17 +116,25 @@ namespace PSServiceBus.Cmdlets
             SbReceiver sbReceiver;
             SbManager sbManager = new SbManager(NamespaceConnectionString);
 
-            if (this.ParameterSetName == "ClearQueue")
+            if (DeadLetterQueue)
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, DeadLetterQueue, sbManager, PrefetchQty, true);
+                QueueStore = new List<SbQueueStores> { SbQueueStores.DeadLetter };
             }
-            else
+
+            foreach (SbQueueStores store in QueueStore)
             {
-                sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, DeadLetterQueue, sbManager, PrefetchQty, true);
+                if (this.ParameterSetName == "ClearQueue")
+                {
+                    sbReceiver = new SbReceiver(NamespaceConnectionString, QueueName, store, sbManager, PrefetchQty, true);
+                }
+                else
+                {
+                    sbReceiver = new SbReceiver(NamespaceConnectionString, TopicName, SubscriptionName, store, sbManager, PrefetchQty, true);
+                }
+                
+                sbReceiver.PurgeMessages(this, ReceiveBatchQty, TimeoutInSeconds);
+                sbReceiver.Dispose();
             }
-            
-            sbReceiver.PurgeMessages(this, ReceiveBatchQty, TimeoutInSeconds);
-            sbReceiver.Dispose();
 
             // use existing PSServiceBus cmdlets to retrieve the queue/subscription to show user the result of the purge
             if (!this.NoOutput)

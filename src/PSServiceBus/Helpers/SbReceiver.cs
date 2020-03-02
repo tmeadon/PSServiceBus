@@ -19,7 +19,7 @@ namespace PSServiceBus.Helpers
 
         private readonly int prefetchQty;
 
-        public SbReceiver(string NamespaceConnectionString, string QueueName, bool ReceiveFromDeadLetter, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
+        public SbReceiver(string NamespaceConnectionString, string QueueName, SbQueueStores QueueStore, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
         {
             tokenCancel = new CancellationTokenSource();
             prefetchQty = PrefetchQty;
@@ -35,7 +35,7 @@ namespace PSServiceBus.Helpers
             {
                 string entityPath = QueueName;
 
-                if (ReceiveFromDeadLetter)
+                if (QueueStore == SbQueueStores.DeadLetter)
                 {
                     entityPath = sbManager.BuildDeadLetterPath(QueueName);
                 }
@@ -48,7 +48,7 @@ namespace PSServiceBus.Helpers
             }
         }
 
-        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, bool ReceiveFromDeadLetter, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
+        public SbReceiver(string NamespaceConnectionString, string TopicName, string SubscriptionName, SbQueueStores QueueStore, ISbManager sbManager, int PrefetchQty = 0, bool PurgeMode = false)
         {
             tokenCancel = new CancellationTokenSource();
             prefetchQty = PrefetchQty;
@@ -65,7 +65,7 @@ namespace PSServiceBus.Helpers
                 string subscriptionPath = sbManager.BuildSubscriptionPath(TopicName, SubscriptionName);
                 string entityPath = subscriptionPath;
 
-                if (ReceiveFromDeadLetter)
+                if (QueueStore == SbQueueStores.DeadLetter)
                 {
                     entityPath = sbManager.BuildDeadLetterPath(subscriptionPath);
                 }
