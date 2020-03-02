@@ -268,7 +268,8 @@ namespace PSServiceBus.Helpers
                     MessageId = message.MessageId,
                     MessageBody = ConvertMessageBodyToString(message.Body),
                     SystemProperties = ConvertSystemPropertiesToIDictonary(message.SystemProperties),
-                    UserProperties = message.UserProperties
+                    UserProperties = message.UserProperties,
+                    ScheduledEnqueuedTimeUtc = message.ScheduledEnqueueTimeUtc
                 });
             }
 

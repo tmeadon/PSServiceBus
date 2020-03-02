@@ -575,6 +575,11 @@
             User Properties
             </summary>
         </member>
+        <member name="F:PSServiceBus.Outputs.SbMessage.ScheduledEnqueuedTimeUtc">
+            <summary>
+            Datetime the messaged is scheduled to be enqueued
+            </summary>
+        </member>
         <member name="T:PSServiceBus.Outputs.SbMessageBatchTestResult">
             <summary>
             Contains the result of a message batch test
