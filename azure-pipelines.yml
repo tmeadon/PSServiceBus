@@ -95,3 +95,5 @@ stages:
           FailOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
         condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+
+        
